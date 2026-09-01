@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>EuQuero Vantagens - Premium</title>
     
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -26,17 +25,25 @@
                     boxShadow: {
                         'app': '0 10px 40px -10px rgba(0,0,0,0.2)',
                         'nav': '0 -4px 20px -5px rgba(0,0,0,0.1)',
-                        'card': '0 4px 15px -3px rgba(0,0,0,0.05)',
+                        'card': '0 10px 25px -5px rgba(0,0,0,0.05), 0 8px 10px -6px rgba(0,0,0,0.01)',
+                        'floating': '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)'
+                    },
+                    animation: {
+                        'draw-check': 'drawCheck 0.5s ease-out forwards',
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    },
+                    keyframes: {
+                        drawCheck: {
+                            '0%': { strokeDasharray: '0, 100' },
+                            '100%': { strokeDasharray: '100, 100' },
+                        }
                     }
                 }
             }
         }
     </script>
     
-    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat:ital,wght@0,700;1,700;1,800&display=swap" rel="stylesheet">
-    
-    <!-- Phosphor Icons -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
 
     <style>
@@ -54,11 +61,9 @@
             justify-content: center; 
             align-items: center; 
             -webkit-tap-highlight-color: transparent;
-            /* Fundo sutil para desktop */
             background-image: radial-gradient(circle at center, #cbd5e1 0%, #94a3b8 100%);
         }
 
-        /* Container do App - Responsivo */
         #app-container { 
             width: 100%; 
             height: 100vh; 
@@ -69,22 +74,19 @@
             overflow: hidden; 
         }
 
-        /* Ocultar barra de rolagem */
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         
-        /* Área de conteúdo rolável */
         .content-area { 
             flex: 1; 
             overflow-y: auto; 
             overflow-x: hidden;
             position: relative;
-            /* Espaço extra no final para o nav inferior não cobrir conteúdo */
-            padding-bottom: calc(80px + var(--safe-area-inset-bottom)); 
+            /* Aumentado o padding-bottom para evitar corte no final das listas */
+            padding-bottom: calc(100px + var(--safe-area-inset-bottom)); 
             background-color: #F8F9FA;
         }
 
-        /* Transições de Tela Suaves (Estilo App Nativo) */
         .screen {
             position: absolute;
             top: 0;
@@ -94,7 +96,6 @@
             background-color: #F8F9FA;
             visibility: hidden;
             opacity: 0;
-            /* Transição deslizando da direita para esquerda */
             transform: translateX(30px);
             transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.3s;
             z-index: 10;
@@ -107,174 +108,105 @@
             z-index: 20;
         }
 
-        /* Animação para tela de Login (desce/sobe) */
         #screen-login {
             transform: translateY(30px);
-            z-index: 30; /* Login sempre por cima ao sair */
+            z-index: 30;
         }
-        #screen-login.active {
-            transform: translateY(0);
-        }
+        #screen-login.active { transform: translateY(0); }
 
-        /* Estilos do Toggle (Switch PF/PJ) no Login */
-        .toggle-switch {
-            position: relative;
-            display: inline-block;
-            width: 64px;
-            height: 32px;
-        }
+        .toggle-switch { position: relative; display: inline-block; width: 64px; height: 32px; }
         .toggle-switch input { opacity: 0; width: 0; height: 0; }
-        .toggle-slider {
-            position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
-            background-color: rgba(255,255,255,0.2); transition: .4s cubic-bezier(0.4, 0, 0.2, 1); border-radius: 32px;
-            border: 2px solid rgba(255,255,255,0.4);
-        }
-        .toggle-slider:before {
-            position: absolute; content: ""; height: 24px; width: 24px; left: 2px; bottom: 2px;
-            background-color: white; transition: .4s cubic-bezier(0.4, 0, 0.2, 1); border-radius: 50%;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
-        }
+        .toggle-slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(255,255,255,0.2); transition: .4s cubic-bezier(0.4, 0, 0.2, 1); border-radius: 32px; border: 2px solid rgba(255,255,255,0.4); }
+        .toggle-slider:before { position: absolute; content: ""; height: 24px; width: 24px; left: 2px; bottom: 2px; background-color: white; transition: .4s cubic-bezier(0.4, 0, 0.2, 1); border-radius: 50%; box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
         input:checked + .toggle-slider { background-color: #E67E22; border-color: #F1C40F; }
         input:checked + .toggle-slider:before { transform: translateX(32px); }
 
-        /* Floating Labels (Inputs do Login) */
-        .input-floating {
-            position: relative;
-            margin-bottom: 1.5rem;
-            width: 100%;
-        }
-        .input-floating input {
-            width: 100%;
-            padding: 1.25rem 1rem 0.5rem 1rem; /* Mais padding no topo para o label */
-            border: 1.5px solid rgba(255,255,255,0.3);
-            border-radius: 12px;
-            background: rgba(255,255,255,0.1);
-            color: white;
-            font-size: 1rem;
-            font-weight: 600;
-            outline: none;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(10px);
-        }
-        .input-floating input:focus {
-            border-color: #F1C40F;
-            background: rgba(255,255,255,0.2);
-            box-shadow: 0 0 0 4px rgba(241, 196, 15, 0.15);
-        }
-        .input-floating label {
-            position: absolute;
-            left: 1rem;
-            top: 50%;
-            transform: translateY(-50%);
-            color: rgba(255,255,255,0.7);
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            pointer-events: none;
-            font-size: 1rem;
-        }
-        /* Quando focado ou quando tem texto (placeholder não mostrado) */
-        .input-floating input:focus ~ label,
-        .input-floating input:not(:placeholder-shown) ~ label {
-            top: 0.6rem;
-            font-size: 0.7rem;
-            color: #F1C40F;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
+        .input-floating { position: relative; margin-bottom: 1.5rem; width: 100%; }
+        .input-floating input { width: 100%; padding: 1.25rem 1rem 0.5rem 1rem; border: 1.5px solid rgba(255,255,255,0.3); border-radius: 12px; background: rgba(255,255,255,0.1); color: white; font-size: 1rem; font-weight: 600; outline: none; transition: all 0.3s ease; backdrop-filter: blur(10px); }
+        .input-floating input:focus { border-color: #F1C40F; background: rgba(255,255,255,0.2); box-shadow: 0 0 0 4px rgba(241, 196, 15, 0.15); }
+        .input-floating label { position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: rgba(255,255,255,0.7); transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); pointer-events: none; font-size: 1rem; }
+        .input-floating input:focus ~ label, .input-floating input:not(:placeholder-shown) ~ label { top: 0.6rem; font-size: 0.7rem; color: #F1C40F; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
         
-        /* Mensagem de Erro (Shake effect) */
-        .error-shake {
-            animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
-            border-color: #ff4757 !important;
-            background: rgba(255, 71, 87, 0.1) !important;
-        }
-        @keyframes shake {
-            10%, 90% { transform: translate3d(-1px, 0, 0); }
-            20%, 80% { transform: translate3d(2px, 0, 0); }
-            30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
-            40%, 60% { transform: translate3d(4px, 0, 0); }
-        }
+        .error-shake { animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both; border-color: #ff4757 !important; background: rgba(255, 71, 87, 0.1) !important; }
+        @keyframes shake { 10%, 90% { transform: translate3d(-1px, 0, 0); } 20%, 80% { transform: translate3d(2px, 0, 0); } 30%, 50%, 70% { transform: translate3d(-4px, 0, 0); } 40%, 60% { transform: translate3d(4px, 0, 0); } }
 
-        /* Efeito Glassmorphism no Nav Inferior */
-        .glass-nav {
-            background: rgba(179, 27, 21, 0.95); /* eqRed com transparência */
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border-top: 1px solid rgba(255, 255, 255, 0.15);
-        }
+        .glass-nav { background: rgba(179, 27, 21, 0.95); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-top: 1px solid rgba(255, 255, 255, 0.15); }
+        
+        .logo-pin { transform-origin: bottom center; animation: bouncePin 2.5s infinite ease-in-out; }
+        @keyframes bouncePin { 0%, 100% { transform: translateY(0) scaleY(1); } 50% { transform: translateY(-5px) scaleY(1.05); } }
 
-        /* Logo Animada (Pin do Q) */
-        .logo-pin {
-            transform-origin: bottom center;
-            animation: bouncePin 2.5s infinite ease-in-out;
-        }
-        @keyframes bouncePin {
-            0%, 100% { transform: translateY(0) scaleY(1); }
-            50% { transform: translateY(-5px) scaleY(1.05); }
-        }
+        /* Estilo da barra de rolagem customizada para filtros */
+        .filter-scroll::-webkit-scrollbar { height: 4px; }
+        .filter-scroll::-webkit-scrollbar-track { background: transparent; }
+        .filter-scroll::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 4px; }
 
-        /* --- RESPONSIVIDADE DESKTOP (Grids em vez de mockup de celular) --- */
         @media (min-width: 768px) {
-            #app-container {
-                /* No desktop, ocupa 100% da tela, sem virar um "celular gigante" */
-                max-width: 100%;
-                border-radius: 0;
-                box-shadow: none;
-            }
-            
-            /* Ajustes para telas maiores */
-            .content-area {
-                padding-left: 2rem;
-                padding-right: 2rem;
-            }
-            
-            /* Grid na Home PF */
-            #ofertas-container {
-                display: grid;
-                grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-                gap: 1.5rem;
-            }
-            
-            /* Grid no Menu PJ */
-            #pj-menu-grid {
-                grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-            }
-
-            /* Centraliza login no desktop */
-            #screen-login .login-content-wrapper {
-                max-width: 450px;
-                margin: 0 auto;
-                width: 100%;
-            }
-            
-            /* Header com restrição de largura para conteúdo ficar alinhado */
-            #global-header > div {
-                max-width: 1200px;
-                margin: 0 auto;
-                width: 100%;
-            }
+            #app-container { max-width: 100%; border-radius: 0; box-shadow: none; }
+            .content-area { padding-left: 2rem; padding-right: 2rem; }
+            #ofertas-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 1.5rem; }
+            #pj-menu-grid { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
+            #screen-login .login-content-wrapper { max-width: 450px; margin: 0 auto; width: 100%; }
+            #global-header > div { max-width: 1200px; margin: 0 auto; width: 100%; }
         }
     </style>
 </head>
 <body>
     <div id="app-container">
         
-        <!-- HEADER GLOBAL (Fixo no topo) -->
+        <div id="sidebar-overlay" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden opacity-0 transition-opacity duration-300" onclick="toggleMenu()"></div>
+        <aside id="sidebar" class="fixed top-0 left-0 h-full w-[280px] bg-white z-50 transform -translate-x-full transition-transform duration-300 ease-in-out shadow-2xl flex flex-col pt-[var(--safe-area-inset-top)]">
+            <div class="bg-gradient-to-b from-eqRed to-eqDarkRed p-6 text-white">
+                <div class="flex justify-between items-start mb-4">
+                    <div class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-md border border-white/30">
+                        <i class="ph ph-user text-3xl"></i>
+                    </div>
+                    <button onclick="toggleMenu()" class="p-2 bg-white/10 rounded-full hover:bg-white/20 transition">
+                        <i class="ph ph-x text-lg"></i>
+                    </button>
+                </div>
+                <h2 id="sidebar-user-name" class="font-display font-bold text-xl truncate">Usuário</h2>
+                <p id="sidebar-user-type" class="text-xs text-white/70 font-medium mt-1 uppercase tracking-widest">Conta Premium</p>
+            </div>
+            
+            <div class="flex-1 overflow-y-auto py-4 px-4 space-y-2">
+                <a href="#" onclick="navegarHome(); toggleMenu();" class="flex items-center p-3 rounded-xl hover:bg-gray-50 text-gray-700 transition">
+                    <i class="ph ph-house text-xl text-eqRed mr-3"></i> <span class="font-semibold text-sm">Página Inicial</span>
+                </a>
+                <a href="#" class="flex items-center p-3 rounded-xl hover:bg-gray-50 text-gray-700 transition">
+                    <i class="ph ph-user-circle text-xl text-eqRed mr-3"></i> <span class="font-semibold text-sm">Meu Perfil</span>
+                </a>
+                <a href="#" class="flex items-center p-3 rounded-xl hover:bg-gray-50 text-gray-700 transition">
+                    <i class="ph ph-bell-ringing text-xl text-eqRed mr-3"></i> <span class="font-semibold text-sm">Notificações</span>
+                    <span class="ml-auto bg-eqRed text-white text-[10px] font-bold px-2 py-0.5 rounded-full">3</span>
+                </a>
+                <div class="h-px bg-gray-100 my-2"></div>
+                <a href="#" class="flex items-center p-3 rounded-xl hover:bg-gray-50 text-gray-700 transition">
+                    <i class="ph ph-gear text-xl text-gray-400 mr-3"></i> <span class="font-semibold text-sm">Configurações</span>
+                </a>
+                <a href="#" class="flex items-center p-3 rounded-xl hover:bg-gray-50 text-gray-700 transition">
+                    <i class="ph ph-headset text-xl text-gray-400 mr-3"></i> <span class="font-semibold text-sm">Central de Ajuda</span>
+                </a>
+            </div>
+            
+            <div class="p-4 border-t border-gray-100 pb-[calc(1rem+var(--safe-area-inset-bottom))]">
+                <button onclick="fazerLogout(); toggleMenu();" class="w-full flex items-center justify-center p-3 rounded-xl bg-red-50 text-eqRed hover:bg-red-100 transition font-bold text-sm">
+                    <i class="ph ph-sign-out text-lg mr-2"></i> Sair do App
+                </button>
+            </div>
+        </aside>
+
         <header id="global-header" class="hidden bg-eqRed text-white z-40 shadow-md flex-col pt-[var(--safe-area-inset-top)]">
             <div class="flex items-center justify-between px-4 py-3 w-full max-w-screen-xl mx-auto">
                 <button onclick="toggleMenu()" class="p-2 -ml-2 rounded-full hover:bg-white/10 transition-colors">
                     <i class="ph ph-list text-2xl"></i>
                 </button>
                 
-                <!-- Nova Logo Redesenhada (SVG) -->
                 <div class="flex flex-col items-center cursor-pointer" onclick="navegarHome()">
                     <div class="flex items-center space-x-0.5">
                         <span class="font-display font-extrabold text-2xl tracking-tight text-white">Eu</span>
                         <div class="relative flex items-center justify-center w-6 h-7 mx-0.5 mt-1">
-                            <!-- SVG do Pin de Localização customizado para formar o Q -->
                             <svg class="logo-pin absolute w-full h-full text-eqYellow drop-shadow-md" viewBox="0 0 24 24" fill="currentColor">
                                 <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 010-5 2.5 2.5 0 010 5z"/>
-                                <!-- Cauda do Q -->
                                 <path d="M14 12l3 3" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
                             </svg>
                         </div>
@@ -283,24 +215,19 @@
                     <span class="font-sans font-semibold text-[10px] uppercase tracking-[0.2em] -mt-1 ml-6 text-white/90">Vantagens</span>
                 </div>
                 
-                <button onclick="fazerLogout()" class="p-2 -mr-2 rounded-full hover:bg-white/10 transition-colors text-white/80" title="Sair">
-                    <i class="ph ph-sign-out text-xl"></i>
-                </button>
+                <div class="w-10"></div> <!-- Placeholder para balancear o botão menu -->
             </div>
-            <!-- Barra de Título Dinâmica -->
             <div id="header-title-bar" class="bg-gradient-to-r from-eqOrange to-eqLightOrange text-white text-center py-2 font-bold text-xs tracking-widest uppercase shadow-inner flex items-center justify-center">
                 <span id="header-title-text">TÍTULO DA TELA</span>
             </div>
         </header>
 
-        <!-- ÁREA DE CONTEÚDO (Telas) -->
         <main class="content-area no-scrollbar">
             
             <!-- TELA 1: LOGIN -->
             <section id="screen-login" class="screen bg-gradient-to-b from-eqRed to-eqDarkRed active flex flex-col justify-between pt-[calc(3rem+var(--safe-area-inset-top))] pb-8 overflow-y-auto">
                 <div class="flex-1 flex flex-col items-center px-6 relative z-10 w-full login-content-wrapper">
                     
-                    <!-- Logo Grande no Login -->
                     <div class="flex flex-col items-center mb-12 transform scale-125 mt-8">
                         <div class="flex items-center space-x-0.5">
                             <span class="font-display font-extrabold text-4xl tracking-tight text-white">Eu</span>
@@ -315,7 +242,6 @@
                         <span class="font-sans font-bold text-xs uppercase tracking-[0.3em] -mt-1 ml-10 text-white/90">Vantagens</span>
                     </div>
 
-                    <!-- Toggle PF/PJ Moderno -->
                     <div class="flex items-center space-x-4 mb-10 bg-black/20 p-2 rounded-full backdrop-blur-sm border border-white/10">
                         <span id="label-pf" class="text-white font-bold text-sm px-3 transition-opacity">Cliente</span>
                         <label class="toggle-switch">
@@ -325,20 +251,16 @@
                         <span id="label-pj" class="text-white/50 font-bold text-sm px-3 transition-opacity">Empresa</span>
                     </div>
 
-                    <!-- Formulário de Login (Real com validação) -->
                     <form id="login-form" class="w-full flex flex-col" onsubmit="realizarLogin(event)">
-                        
                         <div id="login-error-msg" class="hidden text-white text-xs font-bold text-center mb-4 bg-red-500/80 p-3 rounded-xl backdrop-blur border border-red-400 shadow-lg flex items-center justify-center">
                             <i class="ph ph-warning-circle text-lg mr-2"></i> CPF/CNPJ ou senha inválidos.
                         </div>
 
-                        <!-- CPF/CNPJ Input (Floating Label) -->
                         <div class="input-floating">
                             <input type="text" id="login-doc" placeholder=" " autocomplete="off" oninput="formatarDoc(this)">
                             <label id="lbl-doc">CPF</label>
                         </div>
                         
-                        <!-- Senha Input (Floating Label) -->
                         <div class="input-floating mb-3">
                             <input type="password" id="login-pass" placeholder=" ">
                             <label>Senha</label>
@@ -354,7 +276,6 @@
                         </button>
                     </form>
 
-                    <!-- Hint para Apresentação (Invisível no app real, útil pro seu teste) -->
                     <div class="mt-8 p-4 bg-white/5 border border-white/10 rounded-xl text-[10px] text-white/60 text-center leading-relaxed w-full">
                         <p class="font-bold text-white/80 mb-1 border-b border-white/10 pb-1">DADOS PARA TESTE (Senha: 123456)</p>
                         <div class="grid grid-cols-2 gap-2 text-left mt-2">
@@ -371,33 +292,61 @@
                 </div>
             </section>
 
-            <!-- TELA 2: HOME PF (Lista Premium Desktop/Mobile) -->
-            <section id="screen-home-pf" class="screen pt-4 pb-8">
-                <!-- Filtros Rápidos (Estilo pílulas iOS) -->
-                <div class="px-4 mb-4 flex space-x-3 overflow-x-auto no-scrollbar py-1">
-                    <button class="whitespace-nowrap px-5 py-2 bg-eqRed text-white text-xs font-bold rounded-full shadow-md transform hover:scale-105 transition-transform">Todos</button>
-                    <button class="whitespace-nowrap px-5 py-2 bg-white text-gray-600 text-xs font-bold rounded-full shadow-sm hover:bg-gray-50 border border-gray-100 transition-colors">Gastronomia</button>
-                    <button class="whitespace-nowrap px-5 py-2 bg-white text-gray-600 text-xs font-bold rounded-full shadow-sm hover:bg-gray-50 border border-gray-100 transition-colors">Saúde</button>
-                    <button class="whitespace-nowrap px-5 py-2 bg-white text-gray-600 text-xs font-bold rounded-full shadow-sm hover:bg-gray-50 border border-gray-100 transition-colors">Educação</button>
+            <section id="screen-home-pf" class="screen pt-2">
+                
+                <!-- Novos Filtros Detalhados e Visuais -->
+                <div class="mb-6 bg-white shadow-sm border-b border-gray-100 pt-3 pb-4 sticky top-0 z-20">
+                    <div class="px-4 flex items-center justify-between mb-3">
+                        <h2 class="text-sm font-bold text-gray-800">O que você procura?</h2>
+                        <span class="text-[10px] text-eqOrange font-bold flex items-center uppercase"><i class="ph ph-map-pin mr-1"></i>Perto de mim</span>
+                    </div>
+                    
+                    <div class="px-4 flex space-x-3 overflow-x-auto filter-scroll pb-2">
+                        <!-- Filtro Ativo -->
+                        <button class="flex flex-col items-center justify-center p-3 bg-gradient-to-br from-eqRed to-eqDarkRed text-white rounded-2xl shadow-md min-w-[85px] transform hover:scale-105 transition-transform flex-shrink-0 border border-transparent border-b-4 border-b-eqOrange">
+                            <i class="ph ph-squares-four text-2xl mb-1 drop-shadow-sm"></i>
+                            <span class="text-[11px] font-bold tracking-wide">Todos</span>
+                            <span class="text-[9px] text-white/70 mt-0.5">24 locais</span>
+                        </button>
+                        
+                        <!-- Filtros Inativos -->
+                        <button class="flex flex-col items-center justify-center p-3 bg-gray-50 text-gray-600 rounded-2xl border border-gray-200 min-w-[85px] hover:bg-gray-100 hover:text-eqRed transition-colors flex-shrink-0 group">
+                            <i class="ph ph-fork-knife text-2xl mb-1 group-hover:scale-110 transition-transform"></i>
+                            <span class="text-[11px] font-bold tracking-wide group-hover:text-gray-800">Comer</span>
+                            <span class="text-[9px] text-gray-400 mt-0.5">12 locais</span>
+                        </button>
+
+                        <button class="flex flex-col items-center justify-center p-3 bg-gray-50 text-gray-600 rounded-2xl border border-gray-200 min-w-[85px] hover:bg-gray-100 hover:text-eqRed transition-colors flex-shrink-0 group">
+                            <i class="ph ph-heartbeat text-2xl mb-1 group-hover:scale-110 transition-transform"></i>
+                            <span class="text-[11px] font-bold tracking-wide group-hover:text-gray-800">Saúde</span>
+                            <span class="text-[9px] text-gray-400 mt-0.5">5 locais</span>
+                        </button>
+
+                        <button class="flex flex-col items-center justify-center p-3 bg-gray-50 text-gray-600 rounded-2xl border border-gray-200 min-w-[85px] hover:bg-gray-100 hover:text-eqRed transition-colors flex-shrink-0 group">
+                            <i class="ph ph-student text-2xl mb-1 group-hover:scale-110 transition-transform"></i>
+                            <span class="text-[11px] font-bold tracking-wide group-hover:text-gray-800">Educação</span>
+                            <span class="text-[9px] text-gray-400 mt-0.5">7 locais</span>
+                        </button>
+                    </div>
                 </div>
 
-                <div class="px-4" id="ofertas-container">
-                    <!-- Preenchido via JS dinamicamente (Grid em Desktop, Stack em Mobile) -->
+                <!-- Lista de Ofertas Redesenhada -->
+                <div class="px-4 pb-8 space-y-4" id="ofertas-container">
+                    <!-- Preenchido via JS dinamicamente com os novos cards premium -->
                 </div>
             </section>
 
-            <!-- TELA 3: MENU PJ (Dashboard Lojista) -->
             <section id="screen-menu-pj" class="screen bg-gray-50 pt-4">
-                
                 <div class="px-6 mb-6">
-                    <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex items-center">
-                        <div class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mr-4">
-                            <i class="ph ph-storefront text-2xl text-eqRed"></i>
+                    <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex items-center relative overflow-hidden">
+                        <div class="absolute right-0 top-0 w-24 h-24 bg-eqOrange/5 rounded-full -mr-10 -mt-10 blur-xl"></div>
+                        <div class="w-14 h-14 bg-red-50 rounded-full flex items-center justify-center mr-4 border border-red-100 shadow-inner z-10">
+                            <i class="ph ph-storefront text-3xl text-eqRed"></i>
                         </div>
-                        <div>
-                            <h2 class="text-lg font-display font-bold text-gray-800" id="pj-nome-empresa">Restaurante D'Friends</h2>
+                        <div class="z-10">
+                            <h2 class="text-lg font-display font-bold text-gray-800" id="pj-nome-empresa">Empresa</h2>
                             <p class="text-xs text-gray-500 font-medium flex items-center mt-0.5">
-                                CNPJ: 11.111.111/0001-11
+                                CNPJ verificado <i class="ph ph-check-circle-fill text-green-500 ml-1"></i>
                             </p>
                         </div>
                     </div>
@@ -408,18 +357,15 @@
                 </div>
             </section>
 
-            <!-- TELA 4: RENDA (Carteira Digital Premium) -->
             <section id="screen-renda" class="screen bg-gray-50">
-                <!-- Card Principal de Saldo (Estilo Cartão de Crédito/Wallet) -->
-                <div class="bg-gradient-to-br from-eqRed to-eqDarkRed p-6 pb-8 rounded-b-[2.5rem] shadow-xl text-white relative overflow-hidden">
-                    <!-- Elementos decorativos (Glass) -->
+                <div class="bg-gradient-to-br from-eqRed to-eqDarkRed p-6 pb-10 rounded-b-[2.5rem] shadow-xl text-white relative overflow-hidden">
                     <div class="absolute top-0 right-0 -mt-10 -mr-10 w-48 h-48 bg-white opacity-10 rounded-full blur-3xl"></div>
                     <div class="absolute bottom-0 left-0 -mb-10 -ml-10 w-32 h-32 bg-eqOrange opacity-20 rounded-full blur-2xl"></div>
                     
                     <div class="relative z-10 flex justify-between items-end mb-6 mt-2">
                         <div>
                             <p class="text-white/80 text-xs font-semibold uppercase tracking-widest mb-1 flex items-center">
-                                <i class="ph ph-wallet mr-1.5 text-eqYellow"></i> Saldo Liberado
+                                <i class="ph ph-wallet mr-1.5 text-eqYellow text-lg"></i> Saldo Liberado
                             </p>
                             <h2 class="text-4xl font-display font-extrabold tracking-tight" id="renda-liberado">R$ 0,00</h2>
                         </div>
@@ -429,9 +375,8 @@
                         </div>
                     </div>
 
-                    <!-- Alerta de Retenção Dinâmico (Design UI Moderno) -->
-                    <div id="renda-alerta" class="hidden bg-black/20 backdrop-blur-md border border-white/10 p-3 rounded-2xl flex items-start space-x-3 mt-4 transform transition-all">
-                        <div class="bg-eqYellow text-eqDarkRed p-1.5 rounded-full shrink-0 shadow-sm mt-0.5">
+                    <div id="renda-alerta" class="hidden bg-black/20 backdrop-blur-md border border-white/10 p-3 rounded-2xl flex items-start space-x-3 mt-4 transform transition-all shadow-inner">
+                        <div class="bg-eqYellow text-eqDarkRed p-1.5 rounded-full shrink-0 shadow-sm mt-0.5 animate-pulse">
                             <i class="ph ph-lock-key text-lg font-bold"></i>
                         </div>
                         <div>
@@ -443,14 +388,12 @@
                     </div>
                 </div>
 
-                <!-- Formulário de Transferência (Clean UI) -->
-                <div class="p-6 mt-2">
-                    <h3 class="text-sm font-bold text-gray-800 mb-4 flex items-center">
-                        Transferência Bancária
+                <div class="p-6 mt-2 pb-24">
+                    <h3 class="text-sm font-bold text-gray-800 mb-4 flex items-center uppercase tracking-wide">
+                        <i class="ph ph-arrows-left-right text-eqRed mr-2 text-lg"></i> Solicitar Saque
                     </h3>
                     
                     <div class="bg-white rounded-3xl p-6 shadow-card mb-6 border border-gray-100">
-                        <!-- Valor -->
                         <div class="mb-5">
                             <label class="block text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-2">Qual valor transferir?</label>
                             <div class="relative flex items-end border-b-2 border-gray-100 focus-within:border-eqOrange transition-colors pb-1">
@@ -459,7 +402,6 @@
                             </div>
                         </div>
 
-                        <!-- Conta Destino -->
                         <div class="mb-6">
                             <label class="block text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-2">Conta Destino</label>
                             <div class="flex items-center p-3.5 bg-gray-50 rounded-2xl border border-gray-100 transition hover:bg-gray-100 cursor-default">
@@ -472,40 +414,34 @@
                                 </div>
                                 <i class="ph ph-check-circle-fill text-green-500 text-xl shadow-sm rounded-full bg-white"></i>
                             </div>
-                            <p class="text-[9px] text-gray-400 mt-2 font-medium"><i class="ph ph-info mr-1"></i>A conta deve estar no CPF do titular.</p>
                         </div>
 
-                        <!-- Senha Financeira -->
                         <div class="mb-8">
                             <label class="block text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-2">Senha Financeira</label>
                             <input type="password" id="senha-financeira" class="w-full bg-gray-50 border border-gray-200 rounded-xl p-3.5 text-center text-gray-800 font-bold tracking-widest outline-none focus:border-eqOrange focus:ring-4 focus:ring-orange-100 transition" placeholder="••••••••">
                         </div>
 
-                        <button onclick="simularTransferencia()" class="w-full bg-gradient-to-r from-eqOrange to-eqLightOrange text-white font-bold py-4 rounded-xl shadow-[0_8px_20px_rgba(230,126,34,0.3)] hover:shadow-[0_10px_25px_rgba(230,126,34,0.5)] transform hover:-translate-y-1 transition-all text-sm tracking-wide">
-                            CONFIRMAR SAQUE
+                        <button onclick="iniciarSaque()" class="w-full bg-gradient-to-r from-eqOrange to-eqLightOrange text-white font-bold py-4 rounded-xl shadow-[0_8px_20px_rgba(230,126,34,0.3)] hover:shadow-[0_10px_25px_rgba(230,126,34,0.5)] transform hover:-translate-y-1 transition-all text-sm tracking-wide flex justify-center items-center">
+                            <span>CONFIRMAR SAQUE</span>
                         </button>
                     </div>
                 </div>
             </section>
 
-            <!-- TELA 5: DNA (Gestão de Rede Gamificada) -->
             <section id="screen-dna" class="screen bg-white">
-                <!-- Status da Meta (Progress Bar Premium) -->
                 <div class="bg-gray-50 p-6 border-b border-gray-100 sticky top-0 z-20 shadow-sm">
                     <div class="flex justify-between items-end mb-4">
                         <div>
                             <h3 class="font-bold text-gray-800 text-sm flex items-center">
                                 Meta Master (Regra 10%)
                             </h3>
-                            <p class="text-[10px] text-gray-500 font-medium mt-0.5" id="dna-resumo-meta">Você tem 0 diretos. Precisa de 0 Master.</p>
+                            <p class="text-[10px] text-gray-500 font-medium mt-0.5" id="dna-resumo-meta">Calculando...</p>
                         </div>
                         <span id="dna-percent-meta" class="text-2xl font-display font-bold text-eqRed">0%</span>
                     </div>
                     
-                    <!-- Barra Animada -->
                     <div class="w-full bg-gray-200 rounded-full h-3 mb-3 overflow-hidden shadow-inner">
                         <div id="dna-progress-bar" class="bg-gradient-to-r from-eqOrange to-eqLightOrange h-full rounded-full transition-all duration-1000 ease-out w-0 relative">
-                            <!-- Brilho na barra -->
                             <div class="absolute top-0 right-0 bottom-0 left-0 bg-white/20"></div>
                         </div>
                     </div>
@@ -516,11 +452,10 @@
                     </div>
                 </div>
 
-                <!-- Lista de Contatos (Cards Modernos) -->
-                <div class="p-6 bg-white pb-12">
+                <div class="p-6 bg-white pb-32"> <!-- pb-32 adicionado para evitar corte do nav inferior -->
                     <div class="flex justify-between items-center mb-4">
-                        <h4 class="text-xs font-bold text-gray-400 uppercase tracking-widest">Sua Família</h4>
-                        <span class="bg-gray-100 text-gray-600 text-[10px] font-bold px-2 py-1 rounded-md" id="dna-total-filhos-badge">Total: 0</span>
+                        <h4 class="text-xs font-bold text-gray-400 uppercase tracking-widest flex items-center"><i class="ph ph-users mr-1.5 text-lg text-gray-400"></i> Sua Família</h4>
+                        <span class="bg-eqRed/10 text-eqRed text-[10px] font-bold px-2 py-1 rounded-md" id="dna-total-filhos-badge">Total: 0</span>
                     </div>
                     
                     <div class="space-y-3" id="dna-lista-filhos">
@@ -529,8 +464,7 @@
                 </div>
             </section>
             
-            <!-- TELA 6: COMO USAR -->
-            <section id="screen-como-usar" class="screen bg-white p-6">
+            <section id="screen-como-usar" class="screen bg-white p-6 pb-32">
                 <div class="bg-gradient-to-r from-orange-50 to-red-50 border-l-4 border-eqOrange p-5 rounded-r-2xl mb-8 shadow-sm">
                     <h3 class="text-eqDarkRed font-bold mb-2 text-lg">O Futuro do Consumo</h3>
                     <p class="text-sm text-gray-700 leading-relaxed font-medium">
@@ -540,71 +474,118 @@
                 
                 <h4 class="font-bold text-gray-800 mb-4 flex items-center uppercase tracking-wide text-xs"><i class="ph ph-star text-eqYellow mr-2 text-lg"></i> 5 formas de aproveitar:</h4>
                 <ul class="space-y-4 mb-8">
-                    <li class="flex items-center bg-gray-50 p-4 rounded-2xl border border-gray-100 shadow-sm">
-                        <div class="w-10 h-10 rounded-full bg-green-100 text-green-600 flex items-center justify-center mr-4 shrink-0"><i class="ph ph-money text-xl"></i></div>
+                    <li class="flex items-center bg-gray-50 p-4 rounded-2xl border border-gray-100 shadow-sm transition hover:shadow-md">
+                        <div class="w-10 h-10 rounded-full bg-green-100 text-green-600 flex items-center justify-center mr-4 shrink-0 shadow-inner"><i class="ph ph-money text-xl"></i></div>
                         <span class="text-sm font-medium text-gray-700">Renda Extra Mensal (Rede DNA)</span>
                     </li>
-                    <li class="flex items-center bg-gray-50 p-4 rounded-2xl border border-gray-100 shadow-sm">
-                        <div class="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center mr-4 shrink-0"><i class="ph ph-shopping-cart text-xl"></i></div>
+                    <li class="flex items-center bg-gray-50 p-4 rounded-2xl border border-gray-100 shadow-sm transition hover:shadow-md">
+                        <div class="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center mr-4 shrink-0 shadow-inner"><i class="ph ph-shopping-cart text-xl"></i></div>
                         <span class="text-sm font-medium text-gray-700">Comprar como Visitante (Padrão)</span>
                     </li>
-                    <li class="flex items-center bg-gray-50 p-4 rounded-2xl border border-gray-100 shadow-sm">
-                        <div class="w-10 h-10 rounded-full bg-orange-100 text-eqOrange flex items-center justify-center mr-4 shrink-0"><i class="ph ph-tag text-xl"></i></div>
+                    <li class="flex items-center bg-gray-50 p-4 rounded-2xl border border-gray-100 shadow-sm transition hover:shadow-md">
+                        <div class="w-10 h-10 rounded-full bg-orange-100 text-eqOrange flex items-center justify-center mr-4 shrink-0 shadow-inner"><i class="ph ph-tag text-xl"></i></div>
                         <span class="text-sm font-medium text-gray-700">Descontos Grátis (Free - 10%)</span>
                     </li>
-                    <li class="flex items-center bg-gray-50 p-4 rounded-2xl border border-gray-100 shadow-sm">
-                        <div class="w-10 h-10 rounded-full bg-red-100 text-eqRed flex items-center justify-center mr-4 shrink-0"><i class="ph ph-crown text-xl"></i></div>
+                    <li class="flex items-center bg-gray-50 p-4 rounded-2xl border border-gray-100 shadow-sm transition hover:shadow-md">
+                        <div class="w-10 h-10 rounded-full bg-red-100 text-eqRed flex items-center justify-center mr-4 shrink-0 shadow-inner"><i class="ph ph-crown text-xl"></i></div>
                         <span class="text-sm font-medium text-gray-700">Descontos em Dobro (Vip - 20%)</span>
                     </li>
-                    <li class="flex items-center bg-gray-50 p-4 rounded-2xl border border-gray-100 shadow-sm">
-                        <div class="w-10 h-10 rounded-full bg-gray-200 text-gray-700 flex items-center justify-center mr-4 shrink-0"><i class="ph ph-storefront text-xl"></i></div>
+                    <li class="flex items-center bg-gray-50 p-4 rounded-2xl border border-gray-100 shadow-sm transition hover:shadow-md">
+                        <div class="w-10 h-10 rounded-full bg-gray-200 text-gray-700 flex items-center justify-center mr-4 shrink-0 shadow-inner"><i class="ph ph-storefront text-xl"></i></div>
                         <span class="text-sm font-medium text-gray-700">Anunciar sua Empresa (Master)</span>
                     </li>
                 </ul>
             </section>
-
         </main>
 
-        <!-- NAV INFERIOR (Fixo, Glassmorphism) -->
         <nav id="bottom-nav" class="hidden absolute bottom-0 w-full glass-nav text-white/60 z-30 pb-[var(--safe-area-inset-bottom)]">
-            <div class="flex justify-around items-center h-[70px] px-2 w-full max-w-screen-md mx-auto">
+            <div class="flex justify-around items-center h-[75px] px-2 w-full max-w-screen-md mx-auto">
                 <button onclick="navegarHome()" class="nav-btn flex-1 flex flex-col items-center justify-center h-full transition-all duration-300 relative group" data-target="home">
                     <i class="ph ph-house text-[26px] mb-1 group-hover:scale-110 transition-transform"></i>
-                    <span class="text-[9px] font-bold tracking-widest uppercase">Home</span>
+                    <span class="text-[9px] font-bold tracking-widest uppercase mt-0.5">Home</span>
                 </button>
                 <button onclick="navegar('dna')" class="nav-btn flex-1 flex flex-col items-center justify-center h-full transition-all duration-300 relative group" data-target="dna">
                     <i class="ph ph-users-three text-[26px] mb-1 group-hover:scale-110 transition-transform"></i>
-                    <span class="text-[9px] font-bold tracking-widest uppercase">DNA</span>
+                    <span class="text-[9px] font-bold tracking-widest uppercase mt-0.5">DNA</span>
                 </button>
                 <button onclick="navegar('renda')" class="nav-btn flex-1 flex flex-col items-center justify-center h-full transition-all duration-300 relative group" data-target="renda">
                     <i class="ph ph-wallet text-[26px] mb-1 group-hover:scale-110 transition-transform"></i>
-                    <span class="text-[9px] font-bold tracking-widest uppercase">Renda</span>
+                    <span class="text-[9px] font-bold tracking-widest uppercase mt-0.5">Renda</span>
                 </button>
                 <button onclick="navegar('como-usar')" class="nav-btn flex-1 flex flex-col items-center justify-center h-full transition-all duration-300 relative group" data-target="como-usar">
                     <i class="ph ph-device-mobile-camera text-[26px] mb-1 group-hover:scale-110 transition-transform"></i>
-                    <span class="text-[9px] font-bold tracking-widest uppercase">Guia</span>
+                    <span class="text-[9px] font-bold tracking-widest uppercase mt-0.5">Guia</span>
                 </button>
-                <button onclick="alert('Funcionalidade VIP (Upgrade) em desenvolvimento.')" class="flex-1 flex flex-col items-center justify-center h-full text-white/40 hover:text-white transition-colors group">
+                <button onclick="mostrarMsgCustomizada('VIP', 'Funcionalidade de Upgrade VIP (20% de Desconto em tudo) estará disponível no próximo lançamento da plataforma.', 'ph-crown')" class="flex-1 flex flex-col items-center justify-center h-full text-white/40 hover:text-white transition-colors group">
                     <i class="ph ph-crown text-[26px] mb-1 group-hover:scale-110 transition-transform"></i>
-                    <span class="text-[9px] font-bold tracking-widest uppercase">Seja VIP</span>
+                    <span class="text-[9px] font-bold tracking-widest uppercase mt-0.5">Seja VIP</span>
                 </button>
             </div>
-            <!-- Indicador ativo (Linha superior amarela animada) -->
             <div id="nav-indicator" class="absolute top-0 left-0 h-1 w-[20%] bg-eqYellow rounded-b-full transition-transform duration-300 cubic-bezier(0.4, 0, 0.2, 1) transform translate-x-0 shadow-[0_0_8px_rgba(241,196,15,0.8)]"></div>
         </nav>
+        
+        <!-- Modal de Saque -->
+        <div id="modal-saque" class="fixed inset-0 bg-black/70 z-[60] hidden flex-col items-center justify-center p-4 backdrop-blur-sm transition-opacity duration-300 opacity-0">
+            <div class="bg-white rounded-[2rem] p-8 w-full max-w-sm flex flex-col items-center text-center transform scale-95 transition-transform duration-300 shadow-2xl relative overflow-hidden" id="modal-saque-content">
+                
+                <!-- Estado 1: Processando -->
+                <div id="saque-estado-processando" class="w-full flex flex-col items-center">
+                    <div class="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mb-6 shadow-inner relative">
+                        <div class="absolute inset-0 rounded-full border-4 border-gray-100"></div>
+                        <div class="absolute inset-0 rounded-full border-4 border-eqOrange border-t-transparent animate-spin"></div>
+                        <i class="ph ph-paper-plane-tilt text-3xl text-eqOrange relative z-10"></i>
+                    </div>
+                    
+                    <h3 class="text-xl font-display font-bold text-gray-800 mb-2">Processando Saque</h3>
+                    <p class="text-xs text-gray-500 mb-8 font-medium">Conectando com o Banco Central...</p>
+                    
+                    <div class="w-full bg-gray-100 rounded-full h-4 mb-2 overflow-hidden shadow-inner">
+                        <div id="saque-progress-bar" class="bg-gradient-to-r from-eqOrange to-eqLightOrange h-full rounded-full transition-all duration-300 ease-out w-0 relative">
+                            <div class="absolute inset-0 bg-white/20 animate-pulse-slow"></div>
+                        </div>
+                    </div>
+                    <span id="saque-percent" class="text-sm font-bold text-eqRed">0%</span>
+                </div>
+
+                <!-- Estado 2: Sucesso -->
+                <div id="saque-estado-sucesso" class="w-full flex flex-col items-center hidden">
+                    <div class="w-24 h-24 bg-green-50 rounded-full flex items-center justify-center mb-6 shadow-inner">
+                        <svg class="w-12 h-12 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" class="animate-draw-check"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl font-display font-bold text-green-600 mb-2">Sucesso!</h3>
+                    <p class="text-sm text-gray-600 mb-6 font-medium" id="saque-msg-sucesso">Transferência agendada com sucesso.</p>
+                    
+                    <button onclick="fecharModalSaque()" class="w-full bg-green-500 text-white font-bold py-3.5 rounded-xl shadow-[0_8px_20px_rgba(34,197,94,0.3)] hover:bg-green-600 transition-colors text-sm tracking-wide">
+                        ENTENDI
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Genérico (Substitui alerts) -->
+        <div id="modal-generico" class="fixed inset-0 bg-black/60 z-[70] hidden flex-col items-center justify-center p-4 backdrop-blur-sm transition-opacity duration-300 opacity-0">
+            <div class="bg-white rounded-3xl p-6 w-full max-w-sm flex flex-col items-center text-center transform scale-95 transition-transform duration-300 shadow-floating">
+                <div class="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mb-4 shadow-inner">
+                    <i id="modal-gen-icon" class="ph ph-info text-3xl text-eqRed"></i>
+                </div>
+                <h3 id="modal-gen-titulo" class="text-lg font-display font-bold text-gray-800 mb-2">Aviso</h3>
+                <p id="modal-gen-msg" class="text-sm text-gray-600 mb-6 font-medium leading-relaxed"></p>
+                <button onclick="fecharMsgCustomizada()" class="w-full bg-gray-100 text-gray-800 font-bold py-3.5 rounded-xl hover:bg-gray-200 transition-colors text-sm tracking-wide">
+                    FECHAR
+                </button>
+            </div>
+        </div>
 
     </div>
 
-    <!-- SCRIPT PRINCIPAL (Vanilla JS) -->
     <script>
-        // --- BASE DE DADOS (Testes Estratégicos) ---
-        // A senha para todos é: 123456
         const usuariosDB = {
-            // PF 1: Meta 100% Batida (Tem 10 pessoas, 1 Master)
             "111.111.111-11": { 
-                type: 'pf', name: 'João Silva (Ideal)', pass: '123456', saldoGerado: 1500.00,
+                type: 'pf', name: 'João Silva', pass: '123456', saldoGerado: 1500.00,
                 rede: [
-                    {nome: 'Padaria do Zé', data: '10/10', cat: 'Master'}, // O Master salvador
+                    {nome: 'Padaria do Zé', data: '10/10', cat: 'Master'},
                     {nome: 'Maria Silva', data: '11/10', cat: 'Vip'},
                     {nome: 'Pedro Alves', data: '11/10', cat: 'Vip'},
                     {nome: 'Ana Costa', data: '12/10', cat: 'Vip'},
@@ -616,69 +597,84 @@
                     {nome: 'Clark Kent', data: '17/10', cat: 'Vip'}
                 ] 
             },
-            // PF 2: Meta Não Batida / Retenção (Tem 40 pessoas, precisava 4 Masters, só tem 3)
             "222.222.222-22": {
-                type: 'pf', name: 'Maria Souza (Retido)', pass: '123456', saldoGerado: 4000.00,
+                type: 'pf', name: 'Maria Souza', pass: '123456', saldoGerado: 4000.00,
                 rede: [
                     {nome: 'Salão Beleza Elegance', data: '01/10', cat: 'Master'},
                     {nome: 'Dentista Dr. Paulo', data: '05/10', cat: 'Master'},
                     {nome: 'Oficina do Tonho', data: '10/10', cat: 'Master'},
                     {nome: 'Indicado Vip 1', data: '02/10', cat: 'Vip'},
                     {nome: 'Indicado Vip 2', data: '03/10', cat: 'Vip'},
-                    {nome: '+35 Indicados Vips/Free', data: 'Vários', cat: 'Vip'}
+                    {nome: '+35 Indicados Diversos', data: 'Vários', cat: 'Vip'}
                 ],
                 totalRealRede: 40, mastersReais: 3 
             },
-            // PF 3: Iniciante (Várias pessoas, Zero Master = Saque Zero)
             "333.333.333-33": {
-                type: 'pf', name: 'Pedro Alves (Iniciante)', pass: '123456', saldoGerado: 800.00,
+                type: 'pf', name: 'Pedro Alves', pass: '123456', saldoGerado: 800.00,
                 rede: [
                     {nome: 'Amigo 1', data: '02/10', cat: 'Vip'},
                     {nome: 'Primo 2', data: '03/10', cat: 'Free'},
                     {nome: 'Vizinho 3', data: '04/10', cat: 'Vip'},
                 ]
             },
-            // PJ 1: Visão Lojista
             "11.111.111/0001-11": {
                 type: 'pj', name: "Restaurante D'Friends", pass: '123456'
             }
         };
 
-        // Ofertas com imagens locais prontas para serem substituídas
         const ofertasDB = [
-            { id: 1, name: "RESTAURANTE D'FRIENDS", desc: "Bacalhau à Brasileira", bairro: "Taquara", distance: "10 Km", priceVis: "80,00", priceVip: "64,00", priceFree: "72,00", img: "imagem1.jpg", fallbackIcon: "ph-fork-knife", cat: "gastronomia" },
-            { id: 2, name: "DR. EURÍPEDES JACOB", desc: "Clínico Geral Odonto", bairro: "Taquara", distance: "0,1 Km", priceVis: "-", priceVip: "20%", priceFree: "10%", img: "imagem2.jpg", fallbackIcon: "ph-tooth", note: "Consulte normas do Conselho para descontos.", cat: "saude" },
-            { id: 3, name: "CENTRO EDUCACIONAL LN", desc: "Maternal e Jardim", bairro: "Freguesia", distance: "3 Km", priceVis: "800,00", priceVip: "640,00", priceFree: "720,00", img: "imagem3.jpg", fallbackIcon: "ph-student", cat: "educacao" }
+            { id: 1, name: "D'FRIENDS", desc: "Bacalhau, Carnes & Drinks", bairro: "Taquara", distance: "2,5 Km", priceVis: "120,00", priceVip: "96,00", priceFree: "108,00", img: "https://images.unsplash.com/photo-1514933651103-005eec06c04b?ixlib=rb-1.2.1&auto=format&fit=crop&w=400&q=80", fallbackIcon: "ph-fork-knife", cat: "gastronomia" },
+            { id: 2, name: "CLÍNICA DR. JACOB", desc: "Odontologia Estética", bairro: "Barra", distance: "8 Km", priceVis: "Consulte", priceVip: "-20%", priceFree: "-10%", img: "https://images.unsplash.com/photo-1606811841689-23dfddce3e95?ixlib=rb-1.2.1&auto=format&fit=crop&w=400&q=80", fallbackIcon: "ph-tooth", note: "Sujeito às normas do conselho.", cat: "saude" },
+            { id: 3, name: "COLÉGIO APRENDER", desc: "Mensalidade Infantil", bairro: "Freguesia", distance: "3,2 Km", priceVis: "1.000", priceVip: "800", priceFree: "900", img: "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?ixlib=rb-1.2.1&auto=format&fit=crop&w=400&q=80", fallbackIcon: "ph-student", cat: "educacao" }
         ];
 
         let usuarioLogado = null;
         let calculoDNA = {};
 
-        // --- NAVEGAÇÃO E TRANSIÇÕES ---
-        
+        let menuOpen = false;
+        function toggleMenu() {
+            if(!usuarioLogado) return; // Não abre na tela de login
+            
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            menuOpen = !menuOpen;
+            
+            if (menuOpen) {
+                // Atualiza dados no menu
+                document.getElementById('sidebar-user-name').innerText = usuarioLogado.name;
+                document.getElementById('sidebar-user-type').innerText = usuarioLogado.type === 'pf' ? 'Conta Cliente VIP' : 'Conta Master Empresarial';
+                
+                overlay.classList.remove('hidden');
+                // Timeout necessário para a transição de opacidade funcionar após remover hidden
+                setTimeout(() => {
+                    overlay.classList.remove('opacity-0');
+                    sidebar.classList.remove('-translate-x-full');
+                }, 10);
+            } else {
+                sidebar.classList.add('-translate-x-full');
+                overlay.classList.add('opacity-0');
+                setTimeout(() => overlay.classList.add('hidden'), 300);
+            }
+        }
+
         function navegarHome() {
             if (!usuarioLogado) return;
             navegar(usuarioLogado.type === 'pf' ? 'home-pf' : 'menu-pj');
         }
 
         function navegar(rotaId) {
-            // Se for rota 'home', direciona correto pro tipo de usuário
             if (rotaId === 'home') {
                 if(usuarioLogado) rotaId = usuarioLogado.type === 'pf' ? 'home-pf' : 'menu-pj';
                 else rotaId = 'login';
             }
 
-            // Oculta todas as telas (remove active)
             document.querySelectorAll('.screen').forEach(el => el.classList.remove('active'));
             
-            // Exibe a tela alvo (adiciona active para CSS Transition)
             const telaAlvo = document.getElementById(`screen-${rotaId}`);
             if(telaAlvo) {
-                // Pequeno delay para garantir que o display mude antes da opacidade (fluidez)
                 setTimeout(() => telaAlvo.classList.add('active'), 10);
             }
 
-            // Controle de Header e Nav
             const header = document.getElementById('global-header');
             const titleText = document.getElementById('header-title-text');
             const nav = document.getElementById('bottom-nav');
@@ -693,29 +689,29 @@
                 nav.classList.remove('hidden');
                 
                 const titulos = {
-                    'home-pf': 'Ofertas e Descontos',
+                    'home-pf': 'Ofertas Perto de Você',
                     'menu-pj': 'Painel do Anunciante',
-                    'renda': 'Carteira WinMoney',
-                    'dna': 'Gestão de Rede (DNA)',
-                    'como-usar': 'Como Usar o App'
+                    'renda': 'Sua Carteira Digital',
+                    'dna': 'Sua Família DNA',
+                    'como-usar': 'Como Aproveitar'
                 };
                 titleText.innerText = titulos[rotaId] || 'EuQueroVantagens';
             }
 
-            // Atualiza Nav Inferior (Se não for login ou menu PJ)
             if(rotaId !== 'login' && rotaId !== 'menu-pj') {
                 atualizarNavAtivo(rotaId);
             }
 
-            // Popula dados dinâmicos das telas antes delas aparecerem
             popularTela(rotaId);
+            
+            // Rola para o topo sempre que trocar de tela
+            const contentArea = document.querySelector('.content-area');
+            if(contentArea) contentArea.scrollTo(0, 0);
         }
 
         function atualizarNavAtivo(rotaId) {
             const botoes = document.querySelectorAll('.nav-btn');
             const indicador = document.getElementById('nav-indicator');
-            
-            // Trata 'home-pf' apenas como 'home' para o data-target
             const targetId = rotaId.replace('-pf', '');
             
             botoes.forEach((btn, index) => {
@@ -728,8 +724,6 @@
                     icon.classList.remove('text-[26px]');
                     text.classList.replace('text-white/60', 'text-white');
                     text.classList.add('opacity-100');
-                    
-                    // Move a linha amarela superior
                     indicador.style.transform = `translateX(${index * 100}%)`;
                 } else {
                     icon.classList.replace('text-eqYellow', 'text-white/60');
@@ -741,21 +735,16 @@
             });
         }
 
-        // --- LÓGICA DE LOGIN ---
-        
         let tipoLoginAtual = 'pf';
-
         function alternarTipoLogin() {
             const toggle = document.getElementById('login-type-toggle');
             tipoLoginAtual = toggle.checked ? 'pj' : 'pf';
-            
             const docInput = document.getElementById('login-doc');
             const docLabel = document.getElementById('lbl-doc');
             const lblPf = document.getElementById('label-pf');
             const lblPj = document.getElementById('label-pj');
             
             docInput.value = '';
-            
             if (tipoLoginAtual === 'pj') {
                 docLabel.innerText = "CNPJ";
                 lblPf.classList.replace('text-white', 'text-white/50');
@@ -789,11 +778,9 @@
             const errorMsg = document.getElementById('login-error-msg');
             const docInput = document.getElementById('login-doc');
             const passInput = document.getElementById('login-pass');
-
             const user = usuariosDB[doc];
 
             if (user && user.pass === pass && user.type === tipoLoginAtual) {
-                // Login OK
                 errorMsg.classList.add('hidden');
                 docInput.classList.remove('error-shake');
                 passInput.classList.remove('error-shake');
@@ -807,7 +794,6 @@
                 }
                 navegarHome();
             } else {
-                // Erro: Mostra UI de feedback (Shake + Red border)
                 errorMsg.classList.remove('hidden');
                 docInput.classList.add('error-shake');
                 passInput.classList.add('error-shake');
@@ -822,23 +808,20 @@
             usuarioLogado = null;
             document.getElementById('login-form').reset();
             document.getElementById('login-error-msg').classList.add('hidden');
+            if(menuOpen) toggleMenu();
             navegar('login');
         }
-
-        // --- SISTEMA DNA (Motor do App) ---
 
         function processarRegraCashback(user) {
             const totalFilhos = user.totalRealRede || user.rede.length;
             const totalMaster = user.mastersReais !== undefined ? user.mastersReais : user.rede.filter(u => u.cat === 'Master').length;
-            
-            // Regra 10% de Masters
             const metaMasterNecessaria = Math.ceil(totalFilhos * 0.10); 
             
             let percentualLiberado = 100;
             if (metaMasterNecessaria > 0) {
                 percentualLiberado = Math.min(100, (totalMaster / metaMasterNecessaria) * 100);
             } else if (totalFilhos === 0) {
-                percentualLiberado = 0; // Se não tem ninguém, não tem bônus de rede
+                percentualLiberado = 0;
             }
 
             const valorLiberado = user.saldoGerado * (percentualLiberado / 100);
@@ -853,25 +836,19 @@
             };
         }
 
-        // --- POPULADORES DE TELA (Renda e DNA) ---
-        
         const formatDinheiro = (v) => v.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
         function popularTela(rotaId) {
             if (!usuarioLogado) return;
 
-            // TELA RENDA (WALLET)
             if(rotaId === 'renda' && usuarioLogado.type === 'pf') {
                 document.getElementById('renda-total').innerText = 'R$ ' + formatDinheiro(usuarioLogado.saldoGerado);
-                
-                // Anima o saldo subindo
                 const liberadoEl = document.getElementById('renda-liberado');
                 liberadoEl.innerText = 'R$ ' + formatDinheiro(calculoDNA.liberado);
                 
                 const alerta = document.getElementById('renda-alerta');
                 if(calculoDNA.percentual < 100 && calculoDNA.totalPessoas > 0) {
                     alerta.classList.remove('hidden');
-                    // Efeito para chamar atenção
                     setTimeout(() => alerta.classList.add('scale-105', 'bg-red-900/30'), 500);
                     setTimeout(() => alerta.classList.remove('scale-105', 'bg-red-900/30'), 800);
                 } else {
@@ -879,10 +856,9 @@
                 }
             }
             
-            // TELA DNA (GAMIFICAÇÃO)
             if(rotaId === 'dna' && usuarioLogado.type === 'pf') {
                 document.getElementById('dna-total-filhos-badge').innerText = `Total: ${calculoDNA.totalPessoas}`;
-                document.getElementById('dna-resumo-meta').innerText = `Rede: ${calculoDNA.totalPessoas} diretos • Meta: ${calculoDNA.meta} Master`;
+                document.getElementById('dna-resumo-meta').innerText = `Sua Rede: ${calculoDNA.totalPessoas} pessoas • Meta: ${calculoDNA.meta} Empresas Master`;
                 
                 const percentText = document.getElementById('dna-percent-meta');
                 const pBar = document.getElementById('dna-progress-bar');
@@ -891,15 +867,12 @@
                 const msgText = document.getElementById('dna-msg-meta');
                 
                 percentText.innerText = calculoDNA.percentual + '%';
-                
-                // Anima barra de progresso (delay pro CSS atuar)
                 setTimeout(() => { pBar.style.width = calculoDNA.percentual + '%'; }, 150);
 
                 if(calculoDNA.percentual >= 100) {
                     percentText.classList.replace('text-eqRed', 'text-green-500');
                     pBar.classList.replace('from-eqOrange', 'from-green-400');
                     pBar.classList.replace('to-eqLightOrange', 'to-green-500');
-                    
                     msgBox.className = "p-3 rounded-xl border flex items-start space-x-2 bg-green-50 border-green-200 mt-4 shadow-sm";
                     msgIcon.className = "ph ph-check-circle text-green-600 text-lg mt-0.5";
                     msgText.innerHTML = '<strong class="text-green-700">Parabéns! Meta batida.</strong> Você garantiu 100% de saque dos bônus vitálicios da sua rede.';
@@ -907,15 +880,12 @@
                     percentText.classList.replace('text-green-500', 'text-eqRed');
                     pBar.classList.replace('from-green-400', 'from-eqOrange');
                     pBar.classList.replace('to-green-500', 'to-eqLightOrange');
-
                     msgBox.className = "p-3 rounded-xl border flex items-start space-x-2 bg-yellow-50 border-yellow-200 mt-4 shadow-sm";
                     msgIcon.className = "ph ph-warning-circle text-eqOrange text-lg mt-0.5";
-                    
                     const faltam = calculoDNA.meta - calculoDNA.masters;
-                    msgText.innerHTML = `Cadastre mais <strong class="text-eqRed">${faltam} Conta(s) Master</strong> (Anunciantes) para destravar seu bônus de rede integral.`;
+                    msgText.innerHTML = `Cadastre mais <strong class="text-eqRed">${faltam} Empresa(s) Master</strong> (Anunciantes) para destravar seu bônus de rede integral.`;
                 }
 
-                // Renderiza Lista Nominal
                 const listaContainer = document.getElementById('dna-lista-filhos');
                 listaContainer.innerHTML = usuarioLogado.rede.map((f, i) => {
                     let style;
@@ -923,70 +893,65 @@
                     else if(f.cat === 'Vip') style = { cor: 'text-eqRed', bg: 'bg-red-50 border-red-50', icon: 'ph-crown' };
                     else style = { cor: 'text-gray-600', bg: 'bg-gray-50 border-gray-100', icon: 'ph-user' };
                     
-                    // Delay escalonado na animação de entrada (Fade-in-up)
                     return `
                         <div class="flex items-center justify-between p-3.5 border rounded-2xl ${style.bg} shadow-sm opacity-0 animate-[fadeInUp_0.4s_ease-out_forwards]" style="animation-delay: ${i * 0.05}s">
                             <div class="flex items-center space-x-3 overflow-hidden">
-                                <div class="w-10 h-10 rounded-full bg-white shadow-sm flex items-center justify-center shrink-0 border border-gray-100">
-                                    <i class="ph ${style.icon} text-xl ${style.cor}"></i>
+                                <div class="w-11 h-11 rounded-full bg-white shadow-sm flex items-center justify-center shrink-0 border border-gray-100">
+                                    <i class="ph ${style.icon} text-2xl ${style.cor}"></i>
                                 </div>
                                 <div class="truncate">
                                     <p class="font-bold text-[13px] text-gray-800 truncate">${f.nome}</p>
                                     <p class="text-[10px] text-gray-500 font-medium mt-0.5"><i class="ph ph-calendar-blank mr-1"></i>Adesão: ${f.data}</p>
                                 </div>
                             </div>
-                            <span class="text-[9px] font-bold uppercase tracking-wider bg-white ${style.cor} px-2 py-1.5 rounded-lg shadow-sm border border-gray-100 shrink-0">${f.cat}</span>
+                            <span class="text-[9px] font-bold uppercase tracking-wider bg-white ${style.cor} px-2.5 py-1.5 rounded-lg shadow-sm border border-gray-100 shrink-0">${f.cat}</span>
                         </div>
                     `;
                 }).join('');
             }
         }
 
-        // Animação extra CSS via injeção para a lista do DNA
-        const style = document.createElement('style');
-        style.innerHTML = `@keyframes fadeInUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }`;
-        document.head.appendChild(style);
-
-
-        // --- RENDERIZADORES ESTÁTICOS (Home e Menu) ---
+        const styleInject = document.createElement('style');
+        styleInject.innerHTML = `@keyframes fadeInUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }`;
+        document.head.appendChild(styleInject);
 
         function renderizarOfertas() {
             const container = document.getElementById('ofertas-container');
             container.innerHTML = ofertasDB.map(off => `
-                <div class="bg-white rounded-3xl shadow-card overflow-hidden border border-gray-100 flex flex-col transition-transform hover:shadow-lg">
-                    <div class="p-4 flex items-start space-x-4">
-                        <!-- Imagem do Estabelecimento com Tratamento para Imagem não encontrada -->
-                        <div class="w-24 h-24 shrink-0 rounded-2xl overflow-hidden bg-gray-100 border border-gray-200 relative">
-                            <img src="${off.img}" alt="${off.name}" class="w-full h-full object-cover" onerror="this.onerror=null; this.outerHTML='<div class=\\'w-full h-full flex items-center justify-center bg-gray-50 text-gray-300\\'><i class=\\'ph ${off.fallbackIcon} text-4xl\\'></i></div>'">
-                            <div class="absolute bottom-1 left-1 bg-black/60 backdrop-blur text-white text-[8px] font-bold px-1.5 py-0.5 rounded uppercase">Aberto</div>
+                <div class="bg-white rounded-[1.5rem] shadow-card overflow-hidden border border-gray-100 flex flex-col transition-transform hover:shadow-lg relative group cursor-pointer">
+                    <!-- Imagem Grande e Tag Premium -->
+                    <div class="h-40 w-full bg-gray-200 relative overflow-hidden">
+                        <img src="${off.img}" alt="${off.name}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onerror="this.onerror=null; this.outerHTML='<div class=\\'w-full h-full flex items-center justify-center bg-gray-100 text-gray-300\\'><i class=\\'ph ${off.fallbackIcon} text-5xl\\'></i></div>'">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+                        <div class="absolute top-3 right-3 bg-eqRed/90 backdrop-blur text-white text-[9px] font-bold px-2 py-1 rounded-full uppercase shadow-md border border-white/20">
+                            Aberto Agora
                         </div>
-                        
-                        <div class="flex-1 min-w-0 pt-1">
-                            <h3 class="font-display font-bold text-gray-800 text-sm truncate uppercase tracking-tight">${off.name}</h3>
-                            <p class="text-xs text-gray-500 font-medium truncate mt-0.5">${off.desc}</p>
-                            
-                            <div class="flex items-center mt-2.5 text-[11px] text-gray-500 font-medium">
-                                <i class="ph ph-map-pin mr-1 text-eqOrange text-sm"></i>
-                                <span class="truncate">${off.bairro} (${off.distance})</span>
-                            </div>
-                            
-                            ${off.note ? `<p class="text-[9px] text-eqRed italic mt-2 leading-tight">${off.note}</p>` : ''}
+                        <div class="absolute bottom-3 left-4 right-4">
+                            <h3 class="font-display font-extrabold text-white text-lg truncate uppercase tracking-tight drop-shadow-md">${off.name}</h3>
+                            <p class="text-[11px] text-white/90 font-medium truncate drop-shadow-sm flex items-center mt-0.5">
+                                <i class="ph ph-map-pin mr-1 text-eqYellow"></i> ${off.bairro} (${off.distance})
+                            </p>
                         </div>
                     </div>
                     
-                    <!-- Box de Preços (Grid) -->
+                    <div class="p-4 flex-1">
+                        <p class="text-xs text-gray-600 font-medium line-clamp-2">${off.desc}</p>
+                        ${off.note ? `<p class="text-[9px] text-eqRed italic mt-2 leading-tight bg-red-50 p-2 rounded-lg"><i class="ph ph-info mr-1"></i>${off.note}</p>` : ''}
+                    </div>
+                    
                     <div class="grid grid-cols-3 divide-x divide-gray-100 border-t border-gray-100 bg-gray-50">
-                        <div class="py-3 px-1 text-center flex flex-col justify-center">
-                            <span class="block text-[9px] uppercase font-bold text-gray-400 tracking-wider mb-1">Visitante</span>
-                            <span class="block text-sm font-bold text-gray-700">${off.priceVis}</span>
+                        <div class="py-3 px-2 text-center flex flex-col justify-center">
+                            <span class="block text-[9px] uppercase font-bold text-gray-400 tracking-wider mb-1">Padrão</span>
+                            <span class="block text-sm font-bold text-gray-700">R$ ${off.priceVis}</span>
                         </div>
-                        <div class="py-3 px-1 text-center bg-red-50/50 relative overflow-hidden flex flex-col justify-center">
-                            <span class="block text-[9px] uppercase font-bold text-eqRed tracking-wider mb-1">VIP (-20%)</span>
-                            <span class="block text-sm font-bold text-eqRed">${off.priceVip}</span>
-                        </div>
-                        <div class="py-3 px-1 text-center bg-orange-50/50 relative overflow-hidden flex flex-col justify-center">
+                        <div class="py-3 px-2 text-center bg-orange-50/30 relative overflow-hidden flex flex-col justify-center">
                             <span class="block text-[9px] uppercase font-bold text-eqOrange tracking-wider mb-1">Free (-10%)</span>
-                            <span class="block text-sm font-bold text-eqOrange">${off.priceFree}</span>
+                            <span class="block text-sm font-bold text-eqOrange">R$ ${off.priceFree}</span>
+                        </div>
+                        <div class="py-3 px-2 text-center bg-red-50 relative overflow-hidden flex flex-col justify-center border-t-2 border-t-eqRed">
+                            <div class="absolute -top-1 -right-1 w-4 h-4 bg-eqRed transform rotate-45"></div>
+                            <span class="block text-[9px] uppercase font-bold text-eqRed tracking-wider mb-1 flex items-center justify-center"><i class="ph ph-crown mr-1"></i> VIP (-20%)</span>
+                            <span class="block text-base font-extrabold text-eqRed">R$ ${off.priceVip}</span>
                         </div>
                     </div>
                 </div>
@@ -995,22 +960,19 @@
 
         function renderizarMenuPJ() {
             if(!usuarioLogado || usuarioLogado.type !== 'pj') return;
-            
             document.getElementById('pj-nome-empresa').innerText = usuarioLogado.name;
-            
             const menuGrid = document.getElementById('pj-menu-grid');
             const items = [
-                { icon: 'ph-device-mobile-camera', label: 'Ler Cupom', color: 'text-blue-500', bg: 'bg-blue-50' },
-                { icon: 'ph-ticket', label: 'Meus Cupons', color: 'text-eqOrange', bg: 'bg-orange-50', badge: '3' },
-                { icon: 'ph-storefront', label: 'A Empresa', color: 'text-gray-700', bg: 'bg-white border border-gray-200' },
-                { icon: 'ph-pencil-simple', label: 'Editar Dados', color: 'text-gray-700', bg: 'bg-white border border-gray-200' },
-                { icon: 'ph-broadcast', label: 'Anúncios', color: 'text-green-600', bg: 'bg-green-50' },
+                { icon: 'ph-scan', label: 'Ler Cupom', color: 'text-blue-500', bg: 'bg-blue-50' },
+                { icon: 'ph-ticket', label: 'Validados', color: 'text-eqOrange', bg: 'bg-orange-50', badge: '5' },
+                { icon: 'ph-chart-line-up', label: 'Relatórios', color: 'text-green-600', bg: 'bg-green-50' },
+                { icon: 'ph-pencil-simple', label: 'Perfil', color: 'text-gray-700', bg: 'bg-white border border-gray-200' },
+                { icon: 'ph-megaphone', label: 'Impulsionar', color: 'text-purple-600', bg: 'bg-purple-50' },
                 { icon: 'ph-headset', label: 'Suporte', color: 'text-gray-700', bg: 'bg-white border border-gray-200' }
             ];
-
             menuGrid.innerHTML = items.map(item => `
-                <div class="bg-white rounded-3xl shadow-card p-5 flex flex-col items-center justify-center aspect-square relative active:scale-95 transition-transform cursor-pointer border border-gray-50 hover:shadow-lg hover:border-gray-100">
-                    ${item.badge ? `<span class="absolute top-3 right-3 bg-eqRed text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full shadow-sm animate-pulse">${item.badge}</span>` : ''}
+                <div class="bg-white rounded-3xl shadow-card p-5 flex flex-col items-center justify-center aspect-square relative active:scale-95 transition-transform cursor-pointer border border-transparent hover:border-gray-100">
+                    ${item.badge ? `<span class="absolute top-3 right-3 bg-eqRed text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full shadow-sm">${item.badge}</span>` : ''}
                     <div class="w-14 h-14 ${item.bg} rounded-full flex items-center justify-center mb-3 shadow-inner">
                         <i class="ph ${item.icon} text-3xl ${item.color}"></i>
                     </div>
@@ -1019,7 +981,11 @@
             `).join('');
         }
 
-        function simularTransferencia() {
+        // --- SISTEMA DE MODAIS ---
+        
+        let valorTransferenciaGlobal = 0;
+
+        function iniciarSaque() {
             const valInput = document.getElementById('valor-transferencia');
             const senhaInput = document.getElementById('senha-financeira');
             const val = parseFloat(valInput.value);
@@ -1027,11 +993,10 @@
             if (isNaN(val) || val <= 0) {
                 valInput.classList.add('error-shake');
                 setTimeout(() => valInput.classList.remove('error-shake'), 400);
-                return;
+                return mostrarMsgCustomizada("Atenção", "Digite um valor válido para transferir.", "ph-warning-circle");
             }
             if (val > calculoDNA.liberado) {
-                alert('Saldo insuficiente. Parte do seu bônus pode estar retido aguardando o atingimento da meta DNA.');
-                return;
+                return mostrarMsgCustomizada("Saldo Insuficiente", "O valor solicitado é maior que o seu Saldo Liberado. Parte do seu bônus pode estar retido aguardando o atingimento da meta Master na rede DNA.", "ph-lock-key");
             }
             if (!senhaInput.value) {
                 senhaInput.classList.add('error-shake');
@@ -1039,17 +1004,89 @@
                 return;
             }
             
-            // Simula sucesso
-            usuarioLogado.saldoGerado -= val;
-            processarRegraCashback(usuarioLogado); // Recalcula
+            valorTransferenciaGlobal = val;
+            processarSaqueAnimado();
+        }
+
+        function processarSaqueAnimado() {
+            const modal = document.getElementById('modal-saque');
+            const content = document.getElementById('modal-saque-content');
+            const viewProc = document.getElementById('saque-estado-processando');
+            const viewSuc = document.getElementById('saque-estado-sucesso');
+            const barra = document.getElementById('saque-progress-bar');
+            const lblPercent = document.getElementById('saque-percent');
             
-            valInput.value = '';
-            senhaInput.value = '';
+            // Reseta estado UI
+            viewProc.classList.remove('hidden');
+            viewSuc.classList.add('hidden');
+            barra.style.width = '0%';
+            lblPercent.innerText = '0%';
             
-            // Substitui alerta nativo por um feedback visual melhor (simplificado aqui por alerta padrão, ideal seria modal)
-            alert(`✅ Sucesso!\nTransferência de R$ ${formatDinheiro(val)} agendada para sua conta do Banco do Brasil.`);
+            // Exibe Modal
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                content.classList.remove('scale-95');
+            }, 10);
+
+            // Simula Progresso
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += Math.floor(Math.random() * 15) + 5;
+                if(progress > 100) progress = 100;
+                
+                barra.style.width = `${progress}%`;
+                lblPercent.innerText = `${progress}%`;
+                
+                if(progress === 100) {
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        viewProc.classList.add('hidden');
+                        viewSuc.classList.remove('hidden');
+                        document.getElementById('saque-msg-sucesso').innerText = `R$ ${formatDinheiro(valorTransferenciaGlobal)} enviados para o Banco do Brasil.`;
+                        
+                        // Atualiza valores reais
+                        usuarioLogado.saldoGerado -= valorTransferenciaGlobal;
+                        processarRegraCashback(usuarioLogado);
+                        document.getElementById('valor-transferencia').value = '';
+                        document.getElementById('senha-financeira').value = '';
+                    }, 500);
+                }
+            }, 300);
+        }
+
+        function fecharModalSaque() {
+            const modal = document.getElementById('modal-saque');
+            const content = document.getElementById('modal-saque-content');
+            content.classList.add('scale-95');
+            modal.classList.add('opacity-0');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                navegar('renda'); // Força re-render para atualizar textos
+            }, 300);
+        }
+
+        function mostrarMsgCustomizada(titulo, mensagem, icone = 'ph-info') {
+            const modal = document.getElementById('modal-generico');
+            const content = modal.querySelector('div');
             
-            navegar('renda'); // Força re-render para atualizar saldos visualmente
+            document.getElementById('modal-gen-titulo').innerText = titulo;
+            document.getElementById('modal-gen-msg').innerText = mensagem;
+            document.getElementById('modal-gen-icon').className = `ph ${icone} text-3xl text-eqRed`;
+            
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                content.classList.remove('scale-95');
+            }, 10);
+        }
+
+        function fecharMsgCustomizada() {
+            const modal = document.getElementById('modal-generico');
+            const content = modal.querySelector('div');
+            content.classList.add('scale-95');
+            modal.classList.add('opacity-0');
+            setTimeout(() => modal.classList.add('hidden'), 300);
         }
 
     </script>
