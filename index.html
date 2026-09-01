@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>EuQuero Vantagens - Premium</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        eqRed: '#B31B15', // Vermelho um pouco mais vivo para digital
+                        eqDarkRed: '#8B0000',
+                        eqOrange: '#E67E22',
+                        eqLightOrange: '#F39C12',
+                        eqYellow: '#F1C40F',
+                        eqBg: '#F8F9FA' // Fundo mais neutro para destacar os cards
+                    },
+                    fontFamily: {
+                        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+                        display: ['Montserrat', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        'app': '0 10px 40px -10px rgba(0,0,0,0.2)',
+                        'nav': '0 -4px 20px -5px rgba(0,0,0,0.1)',
+                        'card': '0 4px 15px -3px rgba(0,0,0,0.05)',
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat:ital,wght@0,700;1,700;1,800&display=swap" rel="stylesheet">
+    
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <style>
+        /* CSS Base e Reset */
+        :root {
+            --safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
+            --safe-area-inset-top: env(safe-area-inset-top, 0px);
+        }
+        
+        body { 
+            background-color: #E2E8F0; 
+            margin: 0; 
+            min-height: 100vh; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            -webkit-tap-highlight-color: transparent;
+            background-image: radial-gradient(circle at center, #cbd5e1 0%, #94a3b8 100%);
+        }
+
+        /* Container do App (Mobile-first, mas se adapta no desktop) */
+        #app-container { 
+            width: 100%; 
+            height: 100vh; 
+            background-color: #F8F9FA; 
+            position: relative; 
+            display: flex; 
+            flex-direction: column; 
+            overflow: hidden; 
+        }
+
+        /* Responsividade para Desktop: Centraliza e cria aspecto de "celular na tela" */
+        @media (min-width: 640px) {
+            #app-container {
+                max-width: 414px;
+                height: 90vh;
+                max-height: 896px; /* Altura de um iPhone Max */
+                border-radius: 40px;
+                box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), inset 0 0 0 10px #1a1a1a; /* Borda imitando celular */
+                overflow: hidden;
+            }
+            body { padding: 2rem; }
+        }
+
+        /* Ocultar barra de rolagem */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        /* Área de conteúdo rolável */
+        .content-area { 
+            flex: 1; 
+            overflow-y: auto; 
+            overflow-x: hidden;
+            position: relative;
+            padding-bottom: calc(70px + var(--safe-area-inset-bottom)); /* Espaço para o nav inferior */
+            background-color: #F8F9FA;
+        }
+
+        /* Transições de Tela Suaves (Estilo App Nativo) */
+        .screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            min-height: 100%;
+            background-color: #F8F9FA;
+            visibility: hidden;
+            opacity: 0;
+            transform: translateX(20px);
+            transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.3s;
+            z-index: 10;
+        }
+
+        .screen.active {
+            visibility: visible;
+            opacity: 1;
+            transform: translateX(0);
+            z-index: 20;
+        }
+
+        /* Animação para tela de Login saindo/entrando diferente */
+        #screen-login {
+            transform: translateY(20px);
+            z-index: 30; /* Login sempre por cima ao sair */
+        }
+        #screen-login.active {
+            transform: translateY(0);
+        }
+
+        /* Estilos do Toggle de Login */
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 30px;
+        }
+        .toggle-switch input { opacity: 0; width: 0; height: 0; }
+        .toggle-slider {
+            position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(255,255,255,0.3); transition: .4s; border-radius: 30px;
+            border: 2px solid rgba(255,255,255,0.5);
+        }
+        .toggle-slider:before {
+            position: absolute; content: ""; height: 22px; width: 22px; left: 2px; bottom: 2px;
+            background-color: white; transition: .4s; border-radius: 50%;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        input:checked + .toggle-slider { background-color: #E67E22; border-color: #F1C40F; }
+        input:checked + .toggle-slider:before { transform: translateX(30px); }
+
+        /* Inputs estilizados */
+        .input-floating {
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+        .input-floating input {
+            width: 100%;
+            padding: 1rem 1rem 0.5rem 1rem;
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 12px;
+            background: rgba(255,255,255,0.1);
+            color: white;
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s;
+            backdrop-filter: blur(10px);
+        }
+        .input-floating input:focus {
+            border-color: #F1C40F;
+            background: rgba(255,255,255,0.2);
+            box-shadow: 0 0 0 4px rgba(241, 196, 15, 0.1);
+        }
+        .input-floating label {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: rgba(255,255,255,0.7);
+            transition: all 0.2s ease-out;
+            pointer-events: none;
+            font-size: 1rem;
+        }
+        .input-floating input:focus ~ label,
+        .input-floating input:not(:placeholder-shown) ~ label {
+            top: 0.5rem;
+            font-size: 0.75rem;
+            color: #F1C40F;
+            font-weight: 600;
+        }
+        
+        /* Mensagem de Erro */
+        .error-shake {
+            animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+            border-color: #ff4757 !important;
+        }
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-1px, 0, 0); }
+            20%, 80% { transform: translate3d(2px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+            40%, 60% { transform: translate3d(4px, 0, 0); }
+        }
+
+        /* Efeito Glassmorphism no Nav Inferior */
+        .glass-nav {
+            background: rgba(179, 27, 21, 0.95);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Logo Animada */
+        .logo-pin {
+            transform-origin: bottom center;
+            animation: bouncePin 2s infinite ease-in-out;
+        }
+        @keyframes bouncePin {
+            0%, 100% { transform: translateY(0) scaleY(1); }
+            50% { transform: translateY(-4px) scaleY(1.05); }
+        }
+    </style>
+</head>
+<body>
+    <div id="app-container">
+        
+        <!-- HEADER GLOBAL (Fixo no topo) -->
+        <header id="global-header" class="hidden bg-eqRed text-white z-40 shadow-md flex-col pt-[var(--safe-area-inset-top)]">
+            <div class="flex items-center justify-between px-4 py-3">
+                <button onclick="toggleMenu()" class="p-2 -ml-2 rounded-full hover:bg-white/10 transition-colors">
+                    <i class="ph ph-list text-2xl"></i>
+                </button>
+                
+                <!-- Nova Logo Redesenhada (SVG) -->
+                <div class="flex flex-col items-center">
+                    <div class="flex items-center space-x-0.5">
+                        <span class="font-display font-extrabold text-2xl tracking-tight text-white">Eu</span>
+                        <div class="relative flex items-center justify-center w-6 h-7 mx-0.5 mt-1">
+                            <!-- SVG do Pin de Localização customizado para formar o Q -->
+                            <svg class="logo-pin absolute w-full h-full text-eqYellow drop-shadow-md" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 010-5 2.5 2.5 0 010 5z"/>
+                                <!-- Cauda do Q -->
+                                <path d="M14 12l3 3" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+                            </svg>
+                        </div>
+                        <span class="font-display font-extrabold text-2xl tracking-tight text-eqYellow">uero</span>
+                    </div>
+                    <span class="font-sans font-semibold text-[10px] uppercase tracking-[0.2em] -mt-1 ml-6 text-white/90">Vantagens</span>
+                </div>
+                
+                <button onclick="fazerLogout()" class="p-2 -mr-2 rounded-full hover:bg-white/10 transition-colors text-white/80">
+                    <i class="ph ph-sign-out text-xl"></i>
+                </button>
+            </div>
+            <!-- Barra de Título Dinâmica -->
+            <div id="header-title-bar" class="bg-gradient-to-r from-eqOrange to-eqLightOrange text-white text-center py-2 font-bold text-xs tracking-widest uppercase shadow-inner flex items-center justify-center">
+                <span id="header-title-text">TÍTULO DA TELA</span>
+            </div>
+        </header>
+
+        <!-- ÁREA DE CONTEÚDO (Telas) -->
+        <main class="content-area no-scrollbar">
+            
+            <!-- TELA 1: LOGIN -->
+            <section id="screen-login" class="screen bg-gradient-to-b from-eqRed to-eqDarkRed active flex flex-col justify-between pt-[calc(3rem+var(--safe-area-inset-top))]">
+                <div class="flex-1 flex flex-col items-center px-8 relative z-10">
+                    
+                    <!-- Logo Grande no Login -->
+                    <div class="flex flex-col items-center mb-10 transform scale-125 mt-4">
+                        <div class="flex items-center space-x-0.5">
+                            <span class="font-display font-extrabold text-4xl tracking-tight text-white">Eu</span>
+                            <div class="relative flex items-center justify-center w-10 h-11 mx-0.5 mt-1">
+                                <svg class="logo-pin absolute w-full h-full text-eqYellow drop-shadow-lg" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 010-5 2.5 2.5 0 010 5z"/>
+                                    <path d="M14 12l3 3" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+                                </svg>
+                            </div>
+                            <span class="font-display font-extrabold text-4xl tracking-tight text-eqYellow">uero</span>
+                        </div>
+                        <span class="font-sans font-bold text-xs uppercase tracking-[0.3em] -mt-1 ml-10 text-white/90">Vantagens</span>
+                    </div>
+
+                    <!-- Botão Como Usar no Login -->
+                    <button class="flex items-center space-x-2 text-white/80 bg-white/10 px-4 py-1.5 rounded-full backdrop-blur-sm border border-white/20 mb-8 hover:bg-white/20 transition">
+                        <i class="ph ph-device-mobile text-eqYellow"></i>
+                        <span class="text-xs font-semibold">Como usar</span>
+                    </button>
+
+                    <!-- Toggle PF/PJ -->
+                    <div class="flex items-center space-x-4 mb-8">
+                        <span id="label-pf" class="text-white font-bold text-sm transition-opacity">Cliente</span>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="login-type-toggle" onchange="alternarTipoLogin()">
+                            <span class="toggle-slider"></span>
+                        </label>
+                        <span id="label-pj" class="text-white/50 font-bold text-sm transition-opacity">Empresa</span>
+                    </div>
+
+                    <!-- Formulário de Login (Real) -->
+                    <form id="login-form" class="w-full flex flex-col" onsubmit="realizarLogin(event)">
+                        
+                        <div id="login-error-msg" class="hidden text-eqYellow text-xs font-bold text-center mb-4 bg-black/20 p-2 rounded backdrop-blur">
+                            CPF/CNPJ ou senha inválidos. Tente novamente.
+                        </div>
+
+                        <div class="input-floating">
+                            <input type="text" id="login-doc" placeholder=" " autocomplete="off" oninput="formatarDoc(this)">
+                            <label id="lbl-doc">Digite seu CPF</label>
+                        </div>
+                        
+                        <div class="input-floating mb-2">
+                            <input type="password" id="login-pass" placeholder=" ">
+                            <label>Senha</label>
+                        </div>
+                        
+                        <div class="flex justify-end mb-6">
+                            <a href="#" class="text-white/70 text-xs font-medium hover:text-white transition">Esqueceu a senha?</a>
+                        </div>
+
+                        <button type="submit" class="w-full bg-gradient-to-r from-eqOrange to-eqLightOrange text-white font-bold py-3.5 rounded-xl shadow-[0_4px_15px_rgba(230,126,34,0.4)] hover:shadow-[0_6px_20px_rgba(230,126,34,0.6)] transform hover:-translate-y-0.5 transition-all flex justify-center items-center">
+                            <span>ENTRAR</span>
+                            <i class="ph ph-arrow-right ml-2 text-lg"></i>
+                        </button>
+                    </form>
+
+                    <!-- Hint para Avaliação -->
+                    <div class="mt-4 text-[10px] text-white/50 text-center leading-tight">
+                        <p><strong>Avaliador:</strong> Use os dados abaixo para testar:</p>
+                        <p>CPF: <strong>111.111.111-11</strong> (PF 100%) | Senha: <strong>123</strong></p>
+                        <p>CPF: <strong>222.222.222-22</strong> (PF Retido) | Senha: <strong>123</strong></p>
+                        <p>CNPJ: <strong>12.345.678/0001-90</strong> (PJ) | Senha: <strong>123</strong></p>
+                    </div>
+                </div>
+
+                <!-- Rodapé Login -->
+                <div class="w-full mt-auto relative z-10 flex flex-col items-center">
+                    <div class="text-center mb-4">
+                        <p class="text-white/80 text-xs italic mb-2">Ainda não faz parte do nosso clube?</p>
+                        <button class="bg-transparent border border-white/40 text-white font-bold py-2 px-8 rounded-full hover:bg-white/10 transition">
+                            CADASTRE-SE
+                        </button>
+                    </div>
+                    <button type="button" onclick="entrarVisitante()" class="w-full bg-black/30 backdrop-blur-md text-white font-bold py-4 text-center border-t border-white/10 hover:bg-black/40 transition">
+                        ENTRAR COMO VISITANTE
+                    </button>
+                </div>
+            </section>
+
+            <!-- TELA 2: HOME PF (Lista Premium) -->
+            <section id="screen-home-pf" class="screen pb-8">
+                <!-- Filtros Rápidos -->
+                <div class="bg-white px-4 py-3 shadow-sm sticky top-0 z-20 flex space-x-2 overflow-x-auto no-scrollbar">
+                    <button class="whitespace-nowrap px-4 py-1.5 bg-eqRed text-white text-xs font-bold rounded-full shadow-sm">Todos</button>
+                    <button class="whitespace-nowrap px-4 py-1.5 bg-gray-100 text-gray-600 text-xs font-semibold rounded-full hover:bg-gray-200">Restaurantes</button>
+                    <button class="whitespace-nowrap px-4 py-1.5 bg-gray-100 text-gray-600 text-xs font-semibold rounded-full hover:bg-gray-200">Saúde</button>
+                    <button class="whitespace-nowrap px-4 py-1.5 bg-gray-100 text-gray-600 text-xs font-semibold rounded-full hover:bg-gray-200">Educação</button>
+                </div>
+
+                <div class="p-4 space-y-4" id="ofertas-container">
+                    <!-- Preenchido via JS dinamicamente -->
+                </div>
+            </section>
+
+            <!-- TELA 3: MENU PJ (Dashboard) -->
+            <section id="screen-menu-pj" class="screen bg-gray-50">
+                
+                <div class="p-6 pb-2">
+                    <h2 class="text-lg font-display font-bold text-gray-800" id="pj-nome-empresa">Restaurante D'Friends</h2>
+                    <p class="text-xs text-gray-500 font-medium flex items-center mt-1">
+                        <i class="ph ph-identification-card mr-1"></i> CNPJ: 12.345.678/0001-90
+                    </p>
+                </div>
+
+                <div class="p-4 grid grid-cols-2 gap-4 pb-12" id="pj-menu-grid">
+                    <!-- Itens gerados via JS -->
+                </div>
+            </section>
+
+            <!-- TELA 4: RENDA (Design Moderno de Carteira Digital) -->
+            <section id="screen-renda" class="screen bg-gray-50">
+                <!-- Card Principal de Saldo -->
+                <div class="bg-gradient-to-br from-eqRed to-eqDarkRed p-6 rounded-b-[2rem] shadow-lg text-white relative overflow-hidden">
+                    <!-- Elemento decorativo de fundo -->
+                    <div class="absolute top-0 right-0 -mt-10 -mr-10 w-40 h-40 bg-white opacity-5 rounded-full blur-2xl"></div>
+                    
+                    <div class="relative z-10 flex justify-between items-end mb-6">
+                        <div>
+                            <p class="text-white/70 text-xs font-medium uppercase tracking-wider mb-1">Saldo Liberado p/ Saque</p>
+                            <h2 class="text-3xl font-bold font-display" id="renda-liberado">R$ 0,00</h2>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-white/60 text-[10px] font-medium uppercase mb-0.5">Total Gerado (Rede)</p>
+                            <p class="text-sm font-semibold" id="renda-total">R$ 0,00</p>
+                        </div>
+                    </div>
+
+                    <!-- Alerta de Retenção Dinâmico -->
+                    <div id="renda-alerta" class="hidden bg-white/10 backdrop-blur-md border border-white/20 p-3 rounded-xl flex items-start space-x-3 mt-4">
+                        <div class="bg-eqYellow/20 p-1.5 rounded-full text-eqYellow shrink-0">
+                            <i class="ph ph-warning-circle text-lg"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs font-medium text-white/90 leading-tight">
+                                Parte do seu saldo está <span class="font-bold text-eqYellow">retido</span>. 
+                            </p>
+                            <p class="text-[10px] text-white/70 mt-1">Acesse a aba DNA para ver a meta de indicação de Contas Master (Empresas) necessária para liberar 100%.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Formulário de Transferência -->
+                <div class="p-5 mt-2">
+                    <h3 class="text-sm font-bold text-gray-800 mb-4 flex items-center">
+                        <i class="ph ph-bank text-eqRed mr-2 text-lg"></i>
+                        Transferir para Banco
+                    </h3>
+                    
+                    <div class="bg-white rounded-2xl p-5 shadow-card mb-6 border border-gray-100">
+                        <div class="mb-4">
+                            <label class="block text-xs font-semibold text-gray-500 mb-1">Valor da Transferência</label>
+                            <div class="relative flex items-center border-b-2 border-gray-200 focus-within:border-eqOrange transition-colors pb-1">
+                                <span class="text-gray-400 font-bold mr-1">R$</span>
+                                <input type="number" id="valor-transferencia" class="w-full text-2xl font-bold text-gray-800 outline-none bg-transparent" placeholder="0.00" step="0.01">
+                            </div>
+                        </div>
+
+                        <div class="mb-5">
+                            <label class="block text-xs font-semibold text-gray-500 mb-2">Conta Destino Cadastrada</label>
+                            <div class="flex items-center p-3 bg-gray-50 rounded-xl border border-gray-100">
+                                <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center mr-3 shrink-0">
+                                    <i class="ph ph-buildings"></i>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-xs font-bold text-gray-800 truncate" id="renda-nome-banco">Banco do Brasil</p>
+                                    <p class="text-[10px] text-gray-500 truncate">Ag: 0821-7 | CC: 435-3</p>
+                                </div>
+                                <i class="ph ph-check-circle text-green-500"></i>
+                            </div>
+                            <p class="text-[9px] text-center text-gray-400 mt-2 italic">A conta deve estar no CPF do titular.</p>
+                        </div>
+
+                        <div class="mb-6">
+                            <label class="block text-xs font-semibold text-gray-500 mb-1">Senha Financeira</label>
+                            <input type="password" id="senha-financeira" class="w-full bg-gray-50 border border-gray-200 rounded-xl p-3 text-center text-gray-800 font-bold outline-none focus:border-eqOrange focus:ring-2 focus:ring-orange-100 transition" placeholder="••••••••">
+                        </div>
+
+                        <button onclick="simularTransferencia()" class="w-full bg-gradient-to-r from-eqOrange to-eqLightOrange text-white font-bold py-3.5 rounded-xl shadow-[0_4px_15px_rgba(230,126,34,0.3)] hover:shadow-[0_6px_20px_rgba(230,126,34,0.5)] transform hover:-translate-y-0.5 transition-all">
+                            CONFIRMAR TRANSFERÊNCIA
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TELA 5: DNA (Gestão de Rede) -->
+            <section id="screen-dna" class="screen bg-white">
+                <!-- Status da Meta -->
+                <div class="bg-gray-50 p-4 border-b border-gray-100 sticky top-0 z-20 shadow-sm">
+                    <div class="flex justify-between items-center mb-3">
+                        <h3 class="font-bold text-gray-800 text-sm flex items-center">
+                            <i class="ph ph-users-three text-eqRed mr-2 text-lg"></i>
+                            Sua Família (Filhos Diretos)
+                        </h3>
+                        <span class="bg-gray-800 text-white text-xs font-bold px-2.5 py-1 rounded-full" id="dna-total-filhos">0</span>
+                    </div>
+                    
+                    <!-- Progress Bar da Meta -->
+                    <div class="bg-white p-3 rounded-xl shadow-sm border border-gray-100">
+                        <div class="flex justify-between text-xs mb-1 font-semibold text-gray-600">
+                            <span>Progresso da Meta Master (10%)</span>
+                            <span id="dna-percent-meta" class="text-eqRed">0%</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2 mb-2 overflow-hidden">
+                            <div id="dna-progress-bar" class="bg-eqOrange h-2 rounded-full transition-all duration-1000 ease-out w-0"></div>
+                        </div>
+                        <p id="dna-msg-meta" class="text-[10px] text-gray-500 text-center"></p>
+                    </div>
+                </div>
+
+                <!-- Lista Simplificada em formato de Cards (Melhor que Tabela p/ Mobile) -->
+                <div class="p-4 bg-white pb-12">
+                    <h4 class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Relação Nominal</h4>
+                    <div class="space-y-3" id="dna-lista-filhos">
+                        <!-- Preenchido via JS -->
+                    </div>
+                </div>
+            </section>
+            
+            <!-- TELA 6: COMO USAR -->
+            <section id="screen-como-usar" class="screen bg-white p-5">
+                <div class="bg-orange-50 border-l-4 border-eqOrange p-4 rounded-r-lg mb-6">
+                    <h3 class="text-eqDarkRed font-bold mb-2">Entenda o EuQueroVantagens</h3>
+                    <p class="text-sm text-gray-700 leading-relaxed">
+                        Muito mais que um app de descontos. Um sistema de bonificação por mérito (DNA) transferível aos herdeiros.
+                    </p>
+                </div>
+                
+                <h4 class="font-bold text-gray-800 mb-3 flex items-center"><i class="ph ph-number-circle-one text-eqRed mr-2 text-xl"></i> Você tem 5 formas de usar:</h4>
+                <ul class="space-y-3 mb-6">
+                    <li class="flex items-start bg-gray-50 p-3 rounded-lg"><i class="ph ph-money text-eqOrange mt-0.5 mr-3"></i> <span class="text-sm font-medium text-gray-700">Para ter <strong>Renda Extra Mensal</strong> (Construindo sua rede).</span></li>
+                    <li class="flex items-start bg-gray-50 p-3 rounded-lg"><i class="ph ph-shopping-cart text-gray-400 mt-0.5 mr-3"></i> <span class="text-sm font-medium text-gray-700">Para comprar como <strong>Visitante</strong> (Desconto Padrão).</span></li>
+                    <li class="flex items-start bg-gray-50 p-3 rounded-lg"><i class="ph ph-tag text-eqLightOrange mt-0.5 mr-3"></i> <span class="text-sm font-medium text-gray-700">Para ter Descontos Grátis <strong>(Free - 10%)</strong>.</span></li>
+                    <li class="flex items-start bg-gray-50 p-3 rounded-lg"><i class="ph ph-crown text-eqRed mt-0.5 mr-3"></i> <span class="text-sm font-medium text-gray-700">Para ter Descontos em Dobro <strong>(Vip - 20%)</strong>.</span></li>
+                    <li class="flex items-start bg-gray-50 p-3 rounded-lg"><i class="ph ph-storefront text-gray-800 mt-0.5 mr-3"></i> <span class="text-sm font-medium text-gray-700">Para anunciar sua Empresa <strong>(Master)</strong>.</span></li>
+                </ul>
+            </section>
+
+        </main>
+
+        <!-- NAV INFERIOR (Fixo, Glassmorphism) -->
+        <nav id="bottom-nav" class="hidden absolute bottom-0 w-full glass-nav text-white/70 z-30 pb-[var(--safe-area-inset-bottom)]">
+            <div class="flex justify-around items-center h-[60px] px-2">
+                <button onclick="navegar('home')" class="nav-btn flex-1 flex flex-col items-center justify-center h-full transition-colors relative" data-target="home">
+                    <i class="ph ph-house text-2xl mb-1 transition-transform"></i>
+                    <span class="text-[9px] font-bold tracking-wider uppercase">Home</span>
+                </button>
+                <button onclick="navegar('dna')" class="nav-btn flex-1 flex flex-col items-center justify-center h-full transition-colors relative" data-target="dna">
+                    <i class="ph ph-users-three text-2xl mb-1 transition-transform"></i>
+                    <span class="text-[9px] font-bold tracking-wider uppercase">DNA</span>
+                </button>
+                <button onclick="navegar('renda')" class="nav-btn flex-1 flex flex-col items-center justify-center h-full transition-colors relative" data-target="renda">
+                    <i class="ph ph-wallet text-2xl mb-1 transition-transform"></i>
+                    <span class="text-[9px] font-bold tracking-wider uppercase">Renda</span>
+                </button>
+                <button onclick="navegar('como-usar')" class="nav-btn flex-1 flex flex-col items-center justify-center h-full transition-colors relative" data-target="como-usar">
+                    <i class="ph ph-device-mobile-camera text-2xl mb-1 transition-transform"></i>
+                    <span class="text-[9px] font-bold tracking-wider uppercase">Guia</span>
+                </button>
+                <button onclick="alert('Funcionalidade de Assinatura VIP em desenvolvimento.')" class="flex-1 flex flex-col items-center justify-center h-full text-white/50 hover:text-white transition-colors">
+                    <i class="ph ph-crown text-2xl mb-1"></i>
+                    <span class="text-[9px] font-bold tracking-wider uppercase">Seja VIP</span>
+                </button>
+            </div>
+            <!-- Indicador ativo (bolinha animada) -->
+            <div id="nav-indicator" class="absolute top-0 left-0 h-1 w-[20%] bg-eqYellow rounded-b-full transition-transform duration-300 ease-out transform translate-x-0"></div>
+        </nav>
+
+    </div>
+
+    <!-- SCRIPT PRINCIPAL (Vanilla JS) -->
+    <script>
+        // --- BASE DE DADOS (Simulação) ---
+        // CPFs formatados para bater exato com a máscara
+        const usuariosDB = {
+            // PF 1: Situação Ideal (100% Liberado) -> CPF: 111.111.111-11
+            "111.111.111-11": { 
+                type: 'pf', name: 'João Silva (Ideal)', pass: '123', saldoGerado: 1500.00,
+                rede: [
+                    {nome: 'Padaria do Zé', data: '10/10', cat: 'Master'},
+                    {nome: 'Maria Silva', data: '11/10', cat: 'Vip'},
+                    {nome: 'Pedro Alves', data: '11/10', cat: 'Vip'},
+                    {nome: 'Ana Costa', data: '12/10', cat: 'Vip'},
+                    {nome: 'Carlos Edu', data: '12/10', cat: 'Free'},
+                    {nome: 'Bia Santos', data: '13/10', cat: 'Vip'},
+                    {nome: 'Rui Barbosa', data: '14/10', cat: 'Vip'},
+                    {nome: 'Lara Croft', data: '15/10', cat: 'Vip'},
+                    {nome: 'Bruce Wayne', data: '16/10', cat: 'Free'},
+                    {nome: 'Clark Kent', data: '17/10', cat: 'Vip'}
+                ] // 10 totais, 1 Master. Regra 10% cumprida.
+            },
+            // PF 2: Bônus Retido -> CPF: 222.222.222-22
+            "222.222.222-22": {
+                type: 'pf', name: 'Maria Souza (Retido)', pass: '123', saldoGerado: 4000.00,
+                rede: [
+                    {nome: 'Salão Beleza', data: '01/10', cat: 'Master'},
+                    // Simular que ela tem 40 indicados, mas só 1 Master. Precisava de 4. (Listando só alguns p/ visual)
+                    {nome: 'Indicado Vip 1', data: '02/10', cat: 'Vip'},
+                    {nome: 'Indicado Vip 2', data: '03/10', cat: 'Vip'},
+                    {nome: 'Indicado Vip 3', data: '04/10', cat: 'Vip'},
+                    {nome: '+36 Indicados', data: 'Vários', cat: 'Vip/Free'}
+                ],
+                totalRealRede: 40, mastersReais: 1 // Dados forçados para a regra matemática
+            },
+            // PJ 1: Restaurante -> CNPJ: 12.345.678/0001-90
+            "12.345.678/0001-90": {
+                type: 'pj', name: "Restaurante D'Friends", pass: '123'
+            }
+        };
+
+        const ofertasDB = [
+            { id: 1, name: "RESTAURANTE D'FRIENDS", desc: "Bacalhau à Brasileira", bairro: "Taquara", distance: "10 Km", priceVis: "80,00", priceVip: "64,00", priceFree: "72,00", img: "https://images.unsplash.com/photo-1544025162-831514eb581e?w=200&h=150&fit=crop", cat: "restaurante" },
+            { id: 2, name: "DR. EURÍPEDES JACOB", desc: "Clínico Geral Odonto", bairro: "Taquara", distance: "0,1 Km", priceVis: "-", priceVip: "20%", priceFree: "10%", icon: "ph-tooth", bg: "bg-blue-50 text-blue-600", cat: "saude" },
+            { id: 3, name: "CENTRO EDUCACIONAL LN", desc: "Maternal e Jardim", bairro: "Freguesia", distance: "3 Km", priceVis: "800,00", priceVip: "640,00", priceFree: "720,00", icon: "ph-student", bg: "bg-green-50 text-green-600", cat: "educacao" }
+        ];
+
+        let usuarioLogado = null;
+        let calculoDNA = {};
+
+        // --- FUNÇÕES DE INTERFACE (UI/UX) ---
+        
+        function navegar(rotaId) {
+            // Oculta todas as telas
+            document.querySelectorAll('.screen').forEach(el => el.classList.remove('active'));
+            
+            // Exibe a tela alvo
+            const telaAlvo = document.getElementById(`screen-${rotaId}`);
+            if(telaAlvo) telaAlvo.classList.add('active');
+
+            // Atualiza Header
+            const header = document.getElementById('global-header');
+            const titleText = document.getElementById('header-title-text');
+            const nav = document.getElementById('bottom-nav');
+            
+            if (rotaId === 'login') {
+                header.classList.add('hidden');
+                header.classList.remove('flex');
+                nav.classList.add('hidden');
+            } else {
+                header.classList.remove('hidden');
+                header.classList.add('flex');
+                nav.classList.remove('hidden');
+                
+                // Mapeia Títulos
+                const titulos = {
+                    'home-pf': 'Ofertas e Descontos',
+                    'menu-pj': 'Painel do Anunciante',
+                    'renda': 'Minha Conta WinMoney',
+                    'dna': 'Gestão de Rede (DNA)',
+                    'como-usar': 'Como Usar o App'
+                };
+                titleText.innerText = titulos[rotaId] || 'EuQueroVantagens';
+            }
+
+            // Atualiza Nav Inferior Visualmente
+            if(rotaId !== 'login' && rotaId !== 'menu-pj') {
+                atualizarNavAtivo(rotaId);
+            }
+        }
+
+        function atualizarNavAtivo(rotaId) {
+            const botoes = document.querySelectorAll('.nav-btn');
+            const indicador = document.getElementById('nav-indicator');
+            
+            botoes.forEach((btn, index) => {
+                const icon = btn.querySelector('i');
+                const text = btn.querySelector('span');
+                
+                if (btn.dataset.target === rotaId.replace('-pf', '')) {
+                    // Estado Ativo
+                    icon.classList.remove('text-white/70', 'text-2xl');
+                    icon.classList.add('text-eqYellow', 'text-3xl', '-translate-y-1');
+                    text.classList.remove('text-white/70');
+                    text.classList.add('text-white', 'opacity-100');
+                    
+                    // Move o indicador (tracinho amarelo no topo)
+                    indicador.style.transform = `translateX(${index * 100}%)`;
+                } else {
+                    // Estado Inativo
+                    icon.classList.add('text-white/70', 'text-2xl');
+                    icon.classList.remove('text-eqYellow', 'text-3xl', '-translate-y-1');
+                    text.classList.add('text-white/70');
+                    text.classList.remove('text-white', 'opacity-100');
+                }
+            });
+        }
+
+        // --- LÓGICA DE NEGÓCIO (LOGIN E MÁSCARAS) ---
+        
+        let tipoLoginAtual = 'pf';
+
+        function alternarTipoLogin() {
+            const toggle = document.getElementById('login-type-toggle');
+            tipoLoginAtual = toggle.checked ? 'pj' : 'pf';
+            
+            const docInput = document.getElementById('login-doc');
+            const docLabel = document.getElementById('lbl-doc');
+            const lblPf = document.getElementById('label-pf');
+            const lblPj = document.getElementById('label-pj');
+            
+            docInput.value = '';
+            
+            if (tipoLoginAtual === 'pj') {
+                docLabel.innerText = "Digite seu CNPJ";
+                lblPf.classList.replace('text-white', 'text-white/50');
+                lblPj.classList.replace('text-white/50', 'text-white');
+            } else {
+                docLabel.innerText = "Digite seu CPF";
+                lblPf.classList.replace('text-white/50', 'text-white');
+                lblPj.classList.replace('text-white', 'text-white/50');
+            }
+        }
+
+        function formatarDoc(input) {
+            let v = input.value.replace(/\D/g,"");
+            if (tipoLoginAtual === 'pf') { // CPF
+                v = v.replace(/(\d{3})(\d)/,"$1.$2");
+                v = v.replace(/(\d{3})(\d)/,"$1.$2");
+                v = v.replace(/(\d{3})(\d{1,2})$/,"$1-$2");
+            } else { // CNPJ
+                v = v.replace(/^(\d{2})(\d)/,"$1.$2");
+                v = v.replace(/^(\d{2})\.(\d{3})(\d)/,"$1.$2.$3");
+                v = v.replace(/\.(\d{3})(\d)/,".$1/$2");
+                v = v.replace(/(\d{4})(\d)/,"$1-$2");
+            }
+            input.value = v;
+        }
+
+        function realizarLogin(e) {
+            e.preventDefault();
+            const doc = document.getElementById('login-doc').value;
+            const pass = document.getElementById('login-pass').value;
+            const errorMsg = document.getElementById('login-error-msg');
+            const docInput = document.getElementById('login-doc');
+
+            const user = usuariosDB[doc];
+
+            if (user && user.pass === pass && user.type === tipoLoginAtual) {
+                // Sucesso
+                errorMsg.classList.add('hidden');
+                docInput.classList.remove('error-shake');
+                usuarioLogado = user;
+                
+                if (user.type === 'pf') {
+                    processarRegraCashback(user);
+                    renderizarOfertas();
+                    navegar('home-pf');
+                } else {
+                    renderizarMenuPJ();
+                    navegar('menu-pj');
+                }
+            } else {
+                // Falha
+                errorMsg.classList.remove('hidden');
+                docInput.classList.add('error-shake');
+                setTimeout(() => docInput.classList.remove('error-shake'), 500);
+            }
+        }
+
+        function fazerLogout() {
+            usuarioLogado = null;
+            document.getElementById('login-form').reset();
+            navegar('login');
+        }
+
+        function entrarVisitante() {
+            alert('Área de Visitante em desenvolvimento.');
+        }
+
+        // --- MOTOR DO SISTEMA DNA (CASHBACK) ---
+
+        function processarRegraCashback(user) {
+            // Usa totais reais forçados ou conta o array da rede
+            const totalFilhos = user.totalRealRede || user.rede.length;
+            const totalMaster = user.mastersReais !== undefined ? user.mastersReais : user.rede.filter(u => u.cat === 'Master').length;
+            
+            // Regra Central: 10% dos filhos devem ser Master. (Arredondado pra cima)
+            const metaMasterNecessaria = Math.ceil(totalFilhos * 0.10); 
+            
+            let percentualLiberado = 100;
+            
+            if (metaMasterNecessaria > 0) {
+                percentualLiberado = Math.min(100, (totalMaster / metaMasterNecessaria) * 100);
+            } else if (totalFilhos === 0) {
+                percentualLiberado = 0;
+            }
+
+            const valorLiberado = user.saldoGerado * (percentualLiberado / 100);
+            
+            calculoDNA = {
+                totalPessoas: totalFilhos,
+                masters: totalMaster,
+                meta: metaMasterNecessaria,
+                percentual: Math.round(percentualLiberado),
+                liberado: valorLiberado,
+                retido: user.saldoGerado - valorLiberado
+            };
+        }
+
+        // --- RENDERIZADORES DE TELA ---
+        
+        const formatDinheiro = (v) => v.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+
+        function renderizarOfertas() {
+            const container = document.getElementById('ofertas-container');
+            container.innerHTML = ofertasDB.map(off => `
+                <div class="bg-white rounded-2xl shadow-card overflow-hidden border border-gray-100 flex flex-col active:scale-[0.98] transition-transform">
+                    <div class="p-3 flex items-start space-x-3">
+                        ${off.img ? 
+                            `<img src="${off.img}" class="w-20 h-20 rounded-xl object-cover" />` : 
+                            `<div class="w-20 h-20 rounded-xl ${off.bg} flex items-center justify-center text-3xl"><i class="ph ${off.icon}"></i></div>`
+                        }
+                        <div class="flex-1 min-w-0 pt-1">
+                            <h3 class="font-display font-bold text-gray-800 text-sm truncate uppercase">${off.name}</h3>
+                            <p class="text-xs text-gray-500 font-medium truncate">${off.desc}</p>
+                            <div class="flex items-center mt-2 text-xs text-gray-500">
+                                <i class="ph ph-map-pin mr-1 text-eqOrange"></i>
+                                <span class="truncate">${off.bairro} (${off.distance})</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Box de Preços Integrado -->
+                    <div class="grid grid-cols-3 divide-x divide-gray-100 border-t border-gray-100 bg-gray-50">
+                        <div class="py-2 px-1 text-center">
+                            <span class="block text-[9px] uppercase font-bold text-gray-400 mb-0.5">Visitante</span>
+                            <span class="block text-xs font-bold text-gray-700">${off.priceVis}</span>
+                        </div>
+                        <div class="py-2 px-1 text-center bg-eqRed/5 relative overflow-hidden">
+                            <div class="absolute -right-3 -top-3 w-8 h-8 bg-eqRed rounded-full opacity-10"></div>
+                            <span class="block text-[9px] uppercase font-bold text-eqRed mb-0.5">VIP (-20%)</span>
+                            <span class="block text-xs font-bold text-eqRed">${off.priceVip}</span>
+                        </div>
+                        <div class="py-2 px-1 text-center bg-eqOrange/5 relative overflow-hidden">
+                            <div class="absolute -left-3 -bottom-3 w-8 h-8 bg-eqOrange rounded-full opacity-10"></div>
+                            <span class="block text-[9px] uppercase font-bold text-eqOrange mb-0.5">Free (-10%)</span>
+                            <span class="block text-xs font-bold text-eqOrange">${off.priceFree}</span>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Sobrescrito da função navegar original para popular dados dinâmicos antes de exibir
+        const originalNavegar = navegar;
+        navegar = function(rotaId) {
+            if(rotaId === 'renda' && usuarioLogado.type === 'pf') {
+                document.getElementById('renda-total').innerText = 'R$ ' + formatDinheiro(usuarioLogado.saldoGerado);
+                document.getElementById('renda-liberado').innerText = 'R$ ' + formatDinheiro(calculoDNA.liberado);
+                
+                const alerta = document.getElementById('renda-alerta');
+                if(calculoDNA.percentual < 100 && calculoDNA.totalPessoas > 0) {
+                    alerta.classList.remove('hidden');
+                } else {
+                    alerta.classList.add('hidden');
+                }
+            }
+            
+            if(rotaId === 'dna' && usuarioLogado.type === 'pf') {
+                document.getElementById('dna-total-filhos').innerText = calculoDNA.totalPessoas;
+                
+                const percentText = document.getElementById('dna-percent-meta');
+                const pBar = document.getElementById('dna-progress-bar');
+                const msg = document.getElementById('dna-msg-meta');
+                
+                percentText.innerText = calculoDNA.percentual + '%';
+                
+                // Anima barra de progresso (delay para CSS atuar)
+                setTimeout(() => { pBar.style.width = calculoDNA.percentual + '%'; }, 100);
+
+                if(calculoDNA.percentual >= 100) {
+                    percentText.classList.replace('text-eqRed', 'text-green-600');
+                    pBar.classList.replace('bg-eqOrange', 'bg-green-500');
+                    msg.innerHTML = '<span class="text-green-600 font-bold"><i class="ph ph-check-circle mr-1"></i>Meta atingida!</span> Você recebe 100% dos bônus gerados.';
+                } else {
+                    percentText.classList.replace('text-green-600', 'text-eqRed');
+                    pBar.classList.replace('bg-green-500', 'bg-eqOrange');
+                    const faltam = calculoDNA.meta - calculoDNA.masters;
+                    msg.innerHTML = `Cadastre mais <strong>${faltam} Conta(s) Master</strong> (Empresas) para destravar seu bônus integral.`;
+                }
+
+                // Lista de rede
+                const listaContainer = document.getElementById('dna-lista-filhos');
+                listaContainer.innerHTML = usuarioLogado.rede.map(f => {
+                    let cor, icon;
+                    if(f.cat === 'Master') { cor = 'text-eqOrange bg-orange-50 border-orange-100'; icon = 'ph-storefront'; }
+                    else if(f.cat === 'Vip') { cor = 'text-eqRed bg-red-50 border-red-100'; icon = 'ph-crown'; }
+                    else { cor = 'text-gray-600 bg-gray-50 border-gray-100'; icon = 'ph-user'; }
+                    
+                    return `
+                        <div class="flex items-center justify-between p-3 border rounded-xl ${cor}">
+                            <div class="flex items-center space-x-3 overflow-hidden">
+                                <div class="w-8 h-8 rounded-full bg-white shadow-sm flex items-center justify-center shrink-0">
+                                    <i class="ph ${icon} text-lg"></i>
+                                </div>
+                                <div class="truncate">
+                                    <p class="font-bold text-xs truncate">${f.nome}</p>
+                                    <p class="text-[10px] opacity-70">Adesão: ${f.data}</p>
+                                </div>
+                            </div>
+                            <span class="text-[10px] font-bold uppercase tracking-wider bg-white/50 px-2 py-1 rounded shadow-sm shrink-0">${f.cat}</span>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            originalNavegar(rotaId);
+        }
+
+        function renderizarMenuPJ() {
+            document.getElementById('pj-nome-empresa').innerText = usuarioLogado.name;
+            
+            const menuGrid = document.getElementById('pj-menu-grid');
+            const items = [
+                { icon: 'ph-device-mobile-camera', label: 'Como usar', color: 'text-blue-500', bg: 'bg-blue-50' },
+                { icon: 'ph-ticket', label: 'Meus Cupons', color: 'text-eqOrange', bg: 'bg-orange-50', badge: '3' },
+                { icon: 'ph-storefront', label: 'A Empresa', color: 'text-gray-700', bg: 'bg-gray-100' },
+                { icon: 'ph-pencil-simple', label: 'Editar Dados', color: 'text-gray-700', bg: 'bg-gray-100' },
+                { icon: 'ph-broadcast', label: 'Anúncios', color: 'text-green-600', bg: 'bg-green-50' },
+                { icon: 'ph-headset', label: 'Suporte', color: 'text-gray-700', bg: 'bg-gray-100' }
+            ];
+
+            menuGrid.innerHTML = items.map(item => `
+                <div class="bg-white rounded-2xl shadow-card p-4 flex flex-col items-center justify-center aspect-square relative active:scale-95 transition-transform cursor-pointer border border-gray-50">
+                    ${item.badge ? `<span class="absolute top-3 right-3 bg-eqRed text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full shadow-sm">${item.badge}</span>` : ''}
+                    <div class="w-14 h-14 ${item.bg} rounded-full flex items-center justify-center mb-3">
+                        <i class="ph ${item.icon} text-3xl ${item.color}"></i>
+                    </div>
+                    <span class="text-xs font-bold text-gray-700 uppercase tracking-wide text-center">${item.label}</span>
+                </div>
+            `).join('');
+        }
+
+        function simularTransferencia() {
+            const valInput = document.getElementById('valor-transferencia');
+            const senhaInput = document.getElementById('senha-financeira');
+            const val = parseFloat(valInput.value);
+            
+            if (isNaN(val) || val <= 0) return alert('Digite um valor válido.');
+            if (val > calculoDNA.liberado) return alert('Saldo insuficiente. Lembre-se que parte do saldo pode estar retido aguardando o atingimento da meta DNA.');
+            if (!senhaInput.value) return alert('Senha financeira obrigatória.');
+            
+            // Simula dedução
+            usuarioLogado.saldoGerado -= val;
+            processarRegraCashback(usuarioLogado); // Recalcula
+            
+            valInput.value = '';
+            senhaInput.value = '';
+            alert(`Sucesso! Transferência de R$ ${formatDinheiro(val)} solicitada para o Banco do Brasil.`);
+            
+            navegar('renda'); // Força re-render
+        }
+
+    </script>
+</body>
+</html>
