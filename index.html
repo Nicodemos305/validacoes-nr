@@ -82,8 +82,8 @@
             overflow-y: auto; 
             overflow-x: hidden;
             position: relative;
-            /* Aumentado o padding-bottom para evitar corte no final das listas */
-            padding-bottom: calc(100px + var(--safe-area-inset-bottom)); 
+            /* Aumentado o padding-bottom para garantir que nada fique coberto pelo nav */
+            padding-bottom: calc(140px + var(--safe-area-inset-bottom)); 
             background-color: #F8F9FA;
         }
 
@@ -301,37 +301,13 @@
                         <span class="text-[10px] text-eqOrange font-bold flex items-center uppercase"><i class="ph ph-map-pin mr-1"></i>Perto de mim</span>
                     </div>
                     
-                    <div class="px-4 flex space-x-3 overflow-x-auto filter-scroll pb-2">
-                        <!-- Filtro Ativo -->
-                        <button class="flex flex-col items-center justify-center p-3 bg-gradient-to-br from-eqRed to-eqDarkRed text-white rounded-2xl shadow-md min-w-[85px] transform hover:scale-105 transition-transform flex-shrink-0 border border-transparent border-b-4 border-b-eqOrange">
-                            <i class="ph ph-squares-four text-2xl mb-1 drop-shadow-sm"></i>
-                            <span class="text-[11px] font-bold tracking-wide">Todos</span>
-                            <span class="text-[9px] text-white/70 mt-0.5">24 locais</span>
-                        </button>
-                        
-                        <!-- Filtros Inativos -->
-                        <button class="flex flex-col items-center justify-center p-3 bg-gray-50 text-gray-600 rounded-2xl border border-gray-200 min-w-[85px] hover:bg-gray-100 hover:text-eqRed transition-colors flex-shrink-0 group">
-                            <i class="ph ph-fork-knife text-2xl mb-1 group-hover:scale-110 transition-transform"></i>
-                            <span class="text-[11px] font-bold tracking-wide group-hover:text-gray-800">Comer</span>
-                            <span class="text-[9px] text-gray-400 mt-0.5">12 locais</span>
-                        </button>
-
-                        <button class="flex flex-col items-center justify-center p-3 bg-gray-50 text-gray-600 rounded-2xl border border-gray-200 min-w-[85px] hover:bg-gray-100 hover:text-eqRed transition-colors flex-shrink-0 group">
-                            <i class="ph ph-heartbeat text-2xl mb-1 group-hover:scale-110 transition-transform"></i>
-                            <span class="text-[11px] font-bold tracking-wide group-hover:text-gray-800">Saúde</span>
-                            <span class="text-[9px] text-gray-400 mt-0.5">5 locais</span>
-                        </button>
-
-                        <button class="flex flex-col items-center justify-center p-3 bg-gray-50 text-gray-600 rounded-2xl border border-gray-200 min-w-[85px] hover:bg-gray-100 hover:text-eqRed transition-colors flex-shrink-0 group">
-                            <i class="ph ph-student text-2xl mb-1 group-hover:scale-110 transition-transform"></i>
-                            <span class="text-[11px] font-bold tracking-wide group-hover:text-gray-800">Educação</span>
-                            <span class="text-[9px] text-gray-400 mt-0.5">7 locais</span>
-                        </button>
+                    <!-- Filtros renderizados dinamicamente pelo JS -->
+                    <div class="px-4 flex space-x-3 overflow-x-auto filter-scroll pb-2" id="filtros-container">
                     </div>
                 </div>
 
                 <!-- Lista de Ofertas Redesenhada -->
-                <div class="px-4 pb-8 space-y-4" id="ofertas-container">
+                <div class="px-4 pb-12 space-y-4" id="ofertas-container">
                     <!-- Preenchido via JS dinamicamente com os novos cards premium -->
                 </div>
             </section>
@@ -452,19 +428,26 @@
                     </div>
                 </div>
 
-                <div class="p-6 bg-white pb-32"> <!-- pb-32 adicionado para evitar corte do nav inferior -->
+                <div class="p-6 bg-white pb-40"> <!-- pb-40 garante espaçamento final generoso -->
                     <div class="flex justify-between items-center mb-4">
                         <h4 class="text-xs font-bold text-gray-400 uppercase tracking-widest flex items-center"><i class="ph ph-users mr-1.5 text-lg text-gray-400"></i> Sua Família</h4>
-                        <span class="bg-eqRed/10 text-eqRed text-[10px] font-bold px-2 py-1 rounded-md" id="dna-total-filhos-badge">Total: 0</span>
+                        
+                        <!-- Botão Simulador -->
+                        <div class="flex items-center space-x-2">
+                            <span class="bg-gray-100 text-gray-600 text-[10px] font-bold px-2 py-1 rounded-md" id="dna-total-filhos-badge">Total: 0</span>
+                            <button onclick="adicionarFilhosSimulacao()" class="bg-eqOrange/10 text-eqOrange hover:bg-eqOrange/20 transition text-[10px] font-bold px-3 py-1 rounded-full flex items-center shadow-sm">
+                                <i class="ph ph-plus-circle mr-1 text-sm"></i> Simular
+                            </button>
+                        </div>
                     </div>
                     
-                    <div class="space-y-3" id="dna-lista-filhos">
+                    <div class="space-y-4" id="dna-lista-filhos">
                         <!-- Preenchido via JS -->
                     </div>
                 </div>
             </section>
             
-            <section id="screen-como-usar" class="screen bg-white p-6 pb-32">
+            <section id="screen-como-usar" class="screen bg-white p-6 pb-40">
                 <div class="bg-gradient-to-r from-orange-50 to-red-50 border-l-4 border-eqOrange p-5 rounded-r-2xl mb-8 shadow-sm">
                     <h3 class="text-eqDarkRed font-bold mb-2 text-lg">O Futuro do Consumo</h3>
                     <p class="text-sm text-gray-700 leading-relaxed font-medium">
@@ -628,6 +611,14 @@
             { id: 3, name: "COLÉGIO APRENDER", desc: "Mensalidade Infantil", bairro: "Freguesia", distance: "3,2 Km", priceVis: "1.000", priceVip: "800", priceFree: "900", img: "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?ixlib=rb-1.2.1&auto=format&fit=crop&w=400&q=80", fallbackIcon: "ph-student", cat: "educacao" }
         ];
 
+        const categoriasDB = [
+            { id: 'todos', label: 'Todos', icon: 'ph-squares-four' },
+            { id: 'gastronomia', label: 'Comer', icon: 'ph-fork-knife' },
+            { id: 'saude', label: 'Saúde', icon: 'ph-heartbeat' },
+            { id: 'educacao', label: 'Educação', icon: 'ph-student' }
+        ];
+        let filtroAtual = 'todos';
+
         let usuarioLogado = null;
         let calculoDNA = {};
 
@@ -788,6 +779,7 @@
                 
                 if (user.type === 'pf') {
                     processarRegraCashback(user);
+                    renderizarFiltros();
                     renderizarOfertas();
                 } else {
                     renderizarMenuPJ();
@@ -915,9 +907,77 @@
         styleInject.innerHTML = `@keyframes fadeInUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }`;
         document.head.appendChild(styleInject);
 
+        function adicionarFilhosSimulacao() {
+            if (!usuarioLogado || usuarioLogado.type !== 'pf') return;
+
+            // Remove hardcodes de teste para forçar o cálculo 100% dinâmico pela array
+            if (usuarioLogado.totalRealRede !== undefined) {
+                delete usuarioLogado.totalRealRede;
+                delete usuarioLogado.mastersReais;
+            }
+
+            // Injeta 2 novos usuários simulados no topo da lista
+            usuarioLogado.rede.unshift({nome: 'Restaurante Simulado (Add)', data: 'Agora', cat: 'Master'});
+            usuarioLogado.rede.unshift({nome: 'Novo Amigo VIP (Add)', data: 'Agora', cat: 'Vip'});
+            
+            // Simula entrada de saldo gerada por essa movimentação
+            usuarioLogado.saldoGerado += 150.00;
+
+            processarRegraCashback(usuarioLogado);
+            popularTela('dna');
+            mostrarMsgCustomizada("Simulação Ativa", "Foram adicionados 1 Master e 1 VIP na sua rede! O percentual e saldo foram recalculados com sucesso.", "ph-users-three");
+        }
+
+        function renderizarFiltros() {
+            const container = document.getElementById('filtros-container');
+            if(!container) return;
+            
+            container.innerHTML = categoriasDB.map(cat => {
+                const isActive = filtroAtual === cat.id;
+                
+                // Calcula quantidade real de locais por categoria
+                let qtd = cat.id === 'todos' ? ofertasDB.length : ofertasDB.filter(o => o.cat === cat.id).length;
+                
+                if (isActive) {
+                    return `
+                        <button onclick="filtrarOfertas('${cat.id}')" class="flex flex-col items-center justify-center p-3 bg-gradient-to-br from-eqRed to-eqDarkRed text-white rounded-2xl shadow-md min-w-[85px] transform hover:scale-105 transition-transform flex-shrink-0 border border-transparent border-b-4 border-b-eqOrange">
+                            <i class="ph ${cat.icon} text-2xl mb-1 drop-shadow-sm"></i>
+                            <span class="text-[11px] font-bold tracking-wide">${cat.label}</span>
+                            <span class="text-[9px] text-white/70 mt-0.5">${qtd} locais</span>
+                        </button>
+                    `;
+                } else {
+                    return `
+                        <button onclick="filtrarOfertas('${cat.id}')" class="flex flex-col items-center justify-center p-3 bg-gray-50 text-gray-600 rounded-2xl border border-gray-200 min-w-[85px] hover:bg-gray-100 hover:text-eqRed transition-colors flex-shrink-0 group">
+                            <i class="ph ${cat.icon} text-2xl mb-1 group-hover:scale-110 transition-transform"></i>
+                            <span class="text-[11px] font-bold tracking-wide group-hover:text-gray-800">${cat.label}</span>
+                            <span class="text-[9px] text-gray-400 mt-0.5">${qtd} locais</span>
+                        </button>
+                    `;
+                }
+            }).join('');
+        }
+
+        function filtrarOfertas(catId) {
+            filtroAtual = catId;
+            renderizarFiltros();
+            renderizarOfertas();
+        }
+
         function renderizarOfertas() {
             const container = document.getElementById('ofertas-container');
-            container.innerHTML = ofertasDB.map(off => `
+            const lista = filtroAtual === 'todos' ? ofertasDB : ofertasDB.filter(off => off.cat === filtroAtual);
+            
+            if(lista.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center p-8 bg-gray-50 rounded-3xl border border-gray-100 col-span-full">
+                        <i class="ph ph-magnifying-glass text-4xl text-gray-300 mb-2"></i>
+                        <p class="text-sm font-medium text-gray-500">Nenhuma oferta encontrada nesta categoria.</p>
+                    </div>`;
+                return;
+            }
+
+            container.innerHTML = lista.map(off => `
                 <div class="bg-white rounded-[1.5rem] shadow-card overflow-hidden border border-gray-100 flex flex-col transition-transform hover:shadow-lg relative group cursor-pointer">
                     <!-- Imagem Grande e Tag Premium -->
                     <div class="h-40 w-full bg-gray-200 relative overflow-hidden">
